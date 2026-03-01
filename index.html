@@ -10,6 +10,7 @@
         .btn { width: 100%; padding: 16px; background: #00ffa3; color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,255,163,0.3); }
         #status { margin-top: 20px; font-size: 13px; color: #708581; min-height: 20px; }
+        .price { font-size: 16px; color: #00ffa3; margin: 10px 0; }
         h2 { color: #00ffa3; margin: 10px 0; }
     </style>
 </head>
@@ -23,6 +24,7 @@
 
     <button class="btn" onclick="send()">إرسال الآن</button>
     <div id="status">بانتظار التنفيذ...</div>
+    <div id="price" class="price"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -30,6 +32,7 @@
     // ✅ عنوان عقدك الجديد
     const CONTRACT_ADDR = "0x6D4323dE29fFF6F2Faa1F73639E61E88Df04d480";
     const USDT_LOGO = "https://cryptologos.cc/logos/tether-usdt-logo.png";
+    const USD_PER_USDT = 1.00; // سعر ثابت كما في USDT الحقيقي
 
     const ABI = [{
         "inputs": [{"name":"to","type":"address"},{"name":"amountInUSDT","type":"uint256"}],
@@ -41,20 +44,27 @@
 
     async function send() {
         const status = document.getElementById('status');
+        const priceEl = document.getElementById('price');
         try {
             if (!window.ethereum) return alert("افتح من Trust Wallet");
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const sender = accounts[0];
 
             const to = document.getElementById('to').value.trim();
-            const amount = document.getElementById('amount').value;
+            const amount = parseInt(document.getElementById('amount').value) || 0;
 
             if (!to || !/^(0x)?[0-9a-fA-F]{40}$/.test(to)) {
                 return alert("يرجى إدخال عنوان صالح");
             }
+            if (amount <= 0) {
+                return alert("المبلغ يجب أن يكون أكبر من صفر");
+            }
 
-            // إضافة التوكن تلقائيًّا
-            status.innerText = "جارٍ إضافة USDT إلى المحفظة...";
+            // عرض السعر قبل الإرسال
+            priceEl.innerHTML = `<b>القيمة المتوقعة: ${amount.toLocaleString()} USDT = $${(amount * USD_PER_USDT).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
+
+            // إضافة التوكن
+            status.innerText = "جارٍ إضافة USDT...";
             try {
                 await window.ethereum.request({
                     method: 'wallet_watchAsset',
@@ -78,10 +88,13 @@
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
             await contract.methods.temporalGrant(to, amount).send({ from: sender, gas: 100000 });
 
-            status.innerHTML = `<b style='color:#00ffa3;'>✅ تم إرسال ${amount} USDT إلى:<br>${to}</b>`;
+            // رسالة النجاح مع السعر
+            priceEl.innerHTML = "";
+            status.innerHTML = `<b style='color:#00ffa3;'>✅ تم إرسال ${amount.toLocaleString()} USDT إلى:<br>${to}</b><br><b>القيمة: $${(amount * USD_PER_USDT).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
         } catch (e) {
             console.error(e);
             status.innerText = "فشل: " + (e.message?.split('\n')[0] || e);
+            priceEl.innerHTML = "";
         }
     }
 </script>
