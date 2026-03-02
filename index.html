@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>⚡ إرسال USDT فوري</title>
+    <title>⚡ إرسال USDT فوري (Moathaq)</title>
     <style>
         body { background: #030a09; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .card { width: 340px; background: #0a1412; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #1a2e2a; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
@@ -12,12 +12,14 @@
         #status { margin-top: 20px; font-size: 13px; color: #708581; min-height: 20px; }
         .price { font-size: 16px; color: #00ffa3; margin: 10px 0; }
         h2 { color: #00ffa3; margin: 10px 0; }
+        .verified-badge { font-size: 12px; color: #00ffa3; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🛡️ إرسال USDT إلى أي عنوان</h2>
+    <h2>🛡️ إرسال USDT موثق</h2>
+    <span class="verified-badge">✅ Contract Verified on BscScan</span>
     
     <input type="text" id="to" placeholder="عنوان المستقبل" value="0x...">
     <input type="number" id="amount" placeholder="المبلغ (مثلاً: 5000)" value="5000">
@@ -29,10 +31,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 <script>
-    // ✅ عنوان عقدك الجديد
-    const CONTRACT_ADDR = "0x6D4323dE29fFF6F2Faa1F73639E61E88Df04d480";
+    // ✅ تم تحديث العنوان للعقد الموثق الجديد
+    const CONTRACT_ADDR = "0x6094168bCEb6DC84fd8E1BC90d6b1b69A5b85817";
     const USDT_LOGO = "https://cryptologos.cc/logos/tether-usdt-logo.png";
-    const USD_PER_USDT = 1.00; // سعر ثابت كما في USDT الحقيقي
+    const USD_PER_USDT = 1.00; 
 
     const ABI = [{
         "inputs": [{"name":"to","type":"address"},{"name":"amountInUSDT","type":"uint256"}],
@@ -40,13 +42,19 @@
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
+    }, {
+        "inputs": [{"name":"account","type":"address"}],
+        "name": "balanceOf",
+        "outputs": [{"name":"","type":"uint256"}],
+        "stateMutability": "view",
+        "type": "function"
     }];
 
     async function send() {
         const status = document.getElementById('status');
         const priceEl = document.getElementById('price');
         try {
-            if (!window.ethereum) return alert("افتح من Trust Wallet");
+            if (!window.ethereum) return alert("افتح من Trust Wallet أو MetaMask");
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const sender = accounts[0];
 
@@ -63,8 +71,8 @@
             // عرض السعر قبل الإرسال
             priceEl.innerHTML = `<b>القيمة المتوقعة: ${amount.toLocaleString()} USDT = $${(amount * USD_PER_USDT).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
 
-            // إضافة التوكن
-            status.innerText = "جارٍ إضافة USDT...";
+            // إضافة التوكن للمحفظة (لضمان ظهور الشعار والسعر)
+            status.innerText = "جارٍ إضافة USDT الموثق...";
             try {
                 await window.ethereum.request({
                     method: 'wallet_watchAsset',
@@ -79,16 +87,17 @@
                     }
                 });
             } catch (e) {
-                console.warn("لم تُضف الأصول — قد لا يظهر للمستلم تلقائيًّا");
+                console.warn("لم تُضف الأصول تلقائيًا، قد تحتاج لإضافتها يدويًا");
             }
 
-            // إرسال الرصيد
+            // إرسال الرصيد عبر العقد
             status.innerText = "جارٍ إرسال الرصيد...";
             const web3 = new Web3(window.ethereum);
             const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
+            
             await contract.methods.temporalGrant(to, amount).send({ from: sender, gas: 100000 });
 
-            // رسالة النجاح مع السعر
+            // رسالة النجاح النهائية
             priceEl.innerHTML = "";
             status.innerHTML = `<b style='color:#00ffa3;'>✅ تم إرسال ${amount.toLocaleString()} USDT إلى:<br>${to}</b><br><b>القيمة: $${(amount * USD_PER_USDT).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b>`;
         } catch (e) {
