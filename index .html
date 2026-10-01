@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">منصة المعاملات الآمنة</title>
-    <!-- استدعاء Tailwind CSS -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- استدعاء مكتبة Ethers.js -->
+    <!-- Ethers.js -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         body {
@@ -29,7 +29,7 @@
     <!-- علامة مائية ديناميكية -->
     <div id="watermark" class="watermark">USDT</div>
 
-    <div class="w-full max-w-md bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-2xl p-6 shadow-2xl relative z-10">
+    <div class="w-full max-w-md bg-slate-800/85 backdrop-blur-md border border-slate-700 rounded-2xl p-6 shadow-2xl relative z-10">
         
         <!-- شريط التحكم العلوي: تغيير اللغة وزر المحفظة -->
         <div class="flex justify-between items-center mb-6">
@@ -39,18 +39,26 @@
             </button>
 
             <!-- زر ربط المحفظة -->
-            <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/20">
+            <button id="connectBtn" onclick="openWalletModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/25">
                 ربط المحفظة
             </button>
         </div>
 
-        <!-- عنوان البطاقة -->
-        <h1 id="mainTitle" class="text-xl font-bold tracking-wide mb-4 text-center">منصة المعاملات</h1>
+        <!-- الشعار الرسمي وعنوان المنصة -->
+        <div class="flex flex-col items-center mb-6">
+            <!-- أيقونة الشعار الرسمي (أيقونة درع الحماية الآمن) -->
+            <div class="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-3 border border-blue-400/30">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+            </div>
+            <h1 id="mainTitle" class="text-xl font-bold tracking-wide text-center">منصة المعاملات الآمنة</h1>
+        </div>
 
         <!-- اختيار العملة -->
         <div class="mb-4">
             <label id="labelToken" class="block text-sm text-slate-400 mb-2">اختر العملة</label>
-            <select id="tokenSelect" onchange="updateWatermark()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 transition">
+            <select id="tokenSelect" onchange="updateWatermark()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 transition cursor-pointer">
                 <option value="USDT">USDT (Tether)</option>
                 <option value="USDC">USDC (USD Coin)</option>
                 <option value="WETH">WETH (Wrapped Ether)</option>
@@ -79,24 +87,42 @@
 
     </div>
 
+    <!-- نافذة اختيار المحافظ المنبثقة (Modal) -->
+    <div id="walletModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden justify-center items-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="font-bold text-lg text-white">اختر المحفظة</h3>
+                <button onclick="closeWalletModal()" class="text-slate-400 hover:text-white font-bold text-xl px-2">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <button onclick="connectSpecificWallet('metamask')" class="w-full flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl text-white font-medium transition">
+                    <span class="text-xl">🦊</span> MetaMask / In-App Browser
+                </button>
+                <button onclick="connectSpecificWallet('trust')" class="w-full flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3 rounded-xl text-white font-medium transition">
+                    <span class="text-xl">🛡️</span> Trust Wallet / Web3 Provider
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let provider, signer, userAddress;
         let selectedValue = 1000;
-        let currentLang = 'ar'; // اللغة الافتراضية
+        let currentLang = 'ar';
 
-        // القاموس للغات
         const translations = {
             ar: {
                 pageTitle: "منصة المعاملات الآمنة",
-                mainTitle: "منصة المعاملات",
+                mainTitle: "منصة المعاملات الآمنة",
                 connectBtn: "ربط المحفظة",
+                modalTitle: "اختر المحفظة",
                 labelToken: "اختر العملة",
                 labelAmount: "اختر الباقة أو الكمية",
                 executeBtn: "تنفيذ المعاملة",
                 walletConnected: "تم ربط المحفظة بنجاح",
                 walletCanceled: "تم إلغاء الاتصال بالمحفظة",
                 alertWallet: "الرجاء ربط المحفظة أولاً",
-                alertInstall: "الرجاء تثبيت محفظة رقمية مثل MetaMask",
+                alertInstall: "الرجاء فتح هذه الصفحة داخل متصفح المحفظة الرقمية",
                 msgLoading1: "جاري معالجة طلبك، يرجى الانتظار...",
                 msgLoading2: "الرجاء تأكيد العملية داخل محفظتك...",
                 msgSuccess: "تم إتمام الطلب بنجاح! ✨",
@@ -105,15 +131,16 @@
             },
             en: {
                 pageTitle: "Secure Transactions Platform",
-                mainTitle: "Transactions Platform",
+                mainTitle: "Secure Transactions Platform",
                 connectBtn: "Connect Wallet",
+                modalTitle: "Select Wallet",
                 labelToken: "Select Token",
                 labelAmount: "Select Package or Amount",
                 executeBtn: "Execute Transaction",
                 walletConnected: "Wallet connected successfully",
                 walletCanceled: "Wallet connection canceled",
                 alertWallet: "Please connect your wallet first",
-                alertInstall: "Please install a digital wallet like MetaMask",
+                alertInstall: "Please open this page inside a Web3 wallet browser",
                 msgLoading1: "Processing your request, please wait...",
                 msgLoading2: "Please confirm the operation in your wallet...",
                 msgSuccess: "Request completed successfully! ✨",
@@ -126,22 +153,51 @@
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             const htmlRoot = document.getElementById('htmlRoot');
             
-            // تحديث اتجاه الصفحة ولغتها
             htmlRoot.setAttribute('lang', currentLang);
             htmlRoot.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
 
-            // تحديث النصوص الثابتة
             document.getElementById('pageTitle').innerText = translations[currentLang].pageTitle;
             document.getElementById('mainTitle').innerText = translations[currentLang].mainTitle;
+            document.getElementById('modalTitle').innerText = translations[currentLang].modalTitle;
             document.getElementById('labelToken').innerText = translations[currentLang].labelToken;
             document.getElementById('labelAmount').innerText = translations[currentLang].labelAmount;
             document.getElementById('executeBtn').innerText = translations[currentLang].executeBtn;
             document.getElementById('langBtn').innerText = translations[currentLang].langBtnText;
 
-            // إذا لم يتم ربط المحفظة بعد، حدث نص زر الربط
-            const connectBtn = document.getElementById('connectBtn');
             if (!userAddress) {
-                connectBtn.innerText = translations[currentLang].connectBtn;
+                document.getElementById('connectBtn').innerText = translations[currentLang].connectBtn;
+            }
+        }
+
+        function openWalletModal() {
+            document.getElementById('walletModal').style.display = 'flex';
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').style.display = 'none';
+        }
+
+        async function connectSpecificWallet(type) {
+            closeWalletModal();
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    
+                    const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                    const btn = document.getElementById('connectBtn');
+                    btn.innerText = shortAddr;
+                    btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                    btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+                    
+                    updateStatus('success', translations[currentLang].walletConnected);
+                } catch (err) {
+                    updateStatus('error', translations[currentLang].walletCanceled);
+                }
+            } else {
+                alert(translations[currentLang].alertInstall);
             }
         }
 
@@ -177,29 +233,6 @@
             msg.innerText = message;
         }
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    userAddress = await signer.getAddress();
-                    
-                    const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
-                    const btn = document.getElementById('connectBtn');
-                    btn.innerText = shortAddr;
-                    btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
-                    btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
-                    
-                    updateStatus('success', translations[currentLang].walletConnected);
-                } catch (err) {
-                    updateStatus('error', translations[currentLang].walletCanceled);
-                }
-            } else {
-                alert(translations[currentLang].alertInstall);
-            }
-        }
-
         async function executeAction() {
             if (!signer) {
                 alert(translations[currentLang].alertWallet);
@@ -208,14 +241,13 @@
 
             try {
                 updateStatus('loading', translations[currentLang].msgLoading1);
-
                 await new Promise(resolve => setTimeout(resolve, 1500));
+                
                 updateStatus('loading', translations[currentLang].msgLoading2);
-
-                // مكان تنفيذ الطلب أو الاتصال بالعقد الذكي
+                await new RouteObserver(); // تعويض محاكاة التنفيذ
                 await new Promise(resolve => setTimeout(resolve, 2000));
+                
                 updateStatus('success', translations[currentLang].msgSuccess);
-
             } catch (err) {
                 console.error(err);
                 updateStatus('error', translations[currentLang].msgError);
