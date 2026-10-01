@@ -1,111 +1,224 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
-    <title>Flash USDT</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">منصة المعاملات الآمنة</title>
+    <!-- استدعاء Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- استدعاء مكتبة Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f9f9f9; color: #333; text-align: center; padding: 40px 20px; }
-        .header { margin-bottom: 30px; }
-        .logo { font-size: 28px; font-weight: bold; color: #2e7d32; }
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            max-width: 500px;
-            margin: 0 auto;
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
         }
-        .btn {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-            width: 90%;
-        }
-        .footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #777;
+        .watermark {
+            position: absolute;
+            opacity: 0.03;
+            pointer-events: none;
+            font-size: 15rem;
+            font-weight: bold;
+            z-index: 0;
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <div class="logo">Flash USDT</div>
-    </div>
-    
-    <div class="card">
-        <h2>⚡ مكافأة فورية</h2>
-        <p>افتح هذا الرابط من محفظتك للحصول على Flash USDT.</p>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- علامة مائية ديناميكية -->
+    <div id="watermark" class="watermark">USDT</div>
+
+    <div class="w-full max-w-md bg-slate-800/80 backdrop-blur-md border border-slate-700 rounded-2xl p-6 shadow-2xl relative z-10">
         
-        <button class="btn" onclick="openInWallet()">فتح في محفظتي</button>
-        
-        <p style="margin-top:20px;">أو اختر مبلغًا:</p>
-        <button class="btn" onclick="send(0.01)">500 USDT بـ 0.01 BNB</button>
-        <button class="btn" onclick="send(0.05)">2,500 USDT بـ 0.05 BNB</button>
-        <button class="btn" onclick="send(0.1)">5,000 USDT بـ 0.1 BNB</button>
-        <button class="btn" onclick="send(1.0)">50,000 USDT بـ 1 BNB</button>
+        <!-- شريط التحكم العلوي: تغيير اللغة وزر المحفظة -->
+        <div class="flex justify-between items-center mb-6">
+            <!-- زر تبديل اللغة -->
+            <button onclick="toggleLanguage()" id="langBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1">
+                🌐 English
+            </button>
 
-        <p style="font-size:12px; color:#555; margin-top:20px;">
-            ⏳ سيتم الإيداع خلال 60 ثانية.
-        </p>
+            <!-- زر ربط المحفظة -->
+            <button id="connectBtn" onclick="connectWallet()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/20">
+                ربط المحفظة
+            </button>
+        </div>
+
+        <!-- عنوان البطاقة -->
+        <h1 id="mainTitle" class="text-xl font-bold tracking-wide mb-4 text-center">منصة المعاملات</h1>
+
+        <!-- اختيار العملة -->
+        <div class="mb-4">
+            <label id="labelToken" class="block text-sm text-slate-400 mb-2">اختر العملة</label>
+            <select id="tokenSelect" onchange="updateWatermark()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 transition">
+                <option value="USDT">USDT (Tether)</option>
+                <option value="USDC">USDC (USD Coin)</option>
+                <option value="WETH">WETH (Wrapped Ether)</option>
+            </select>
+        </div>
+
+        <!-- شبكة الباقات / الكميات -->
+        <div class="mb-6">
+            <label id="labelAmount" class="block text-sm text-slate-400 mb-2">اختر الباقة أو الكمية</label>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="selectAmount(1000, this)" class="amount-btn bg-slate-900 border border-blue-500 rounded-xl p-3 text-center transition hover:border-blue-400 font-bold text-blue-400">1,000</button>
+                <button onclick="selectAmount(5000, this)" class="amount-btn bg-slate-900 border border-slate-700 rounded-xl p-3 text-center transition hover:border-blue-400">5,000</button>
+                <button onclick="selectAmount(10000, this)" class="amount-btn bg-slate-900 border border-slate-700 rounded-xl p-3 text-center transition hover:border-blue-400">10,000</button>
+            </div>
+        </div>
+
+        <!-- زر التنفيذ الرئيسي -->
+        <button id="executeBtn" onclick="executeAction()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl transition shadow-xl shadow-blue-600/30">
+            تنفيذ المعاملة
+        </button>
+
+        <!-- صندوق رسائل الحالة -->
+        <div id="statusBox" class="mt-4 p-3 rounded-xl text-center text-sm hidden transition-all">
+            <span id="statusMessage"></span>
+        </div>
+
     </div>
 
-    <div class="footer">
-        <p>© 2026 Flash Protocol. جميع الحقوق محفوظة.</p>
-    </div>
-
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script>
-        const CONTRACT_ADDR = "0x7325622388A2967BCaAeE94C986836EB7aB80f4E";
+        let provider, signer, userAddress;
+        let selectedValue = 1000;
+        let currentLang = 'ar'; // اللغة الافتراضية
 
-        function openInWallet() {
-            const url = window.location.href;
-            window.location.href = "trust://open_url?url=" + encodeURIComponent(url);
-            setTimeout(() => {
-                window.location.href = "tokenpocket://open?link=" + encodeURIComponent(url);
-            }, 500);
+        // القاموس للغات
+        const translations = {
+            ar: {
+                pageTitle: "منصة المعاملات الآمنة",
+                mainTitle: "منصة المعاملات",
+                connectBtn: "ربط المحفظة",
+                labelToken: "اختر العملة",
+                labelAmount: "اختر الباقة أو الكمية",
+                executeBtn: "تنفيذ المعاملة",
+                walletConnected: "تم ربط المحفظة بنجاح",
+                walletCanceled: "تم إلغاء الاتصال بالمحفظة",
+                alertWallet: "الرجاء ربط المحفظة أولاً",
+                alertInstall: "الرجاء تثبيت محفظة رقمية مثل MetaMask",
+                msgLoading1: "جاري معالجة طلبك، يرجى الانتظار...",
+                msgLoading2: "الرجاء تأكيد العملية داخل محفظتك...",
+                msgSuccess: "تم إتمام الطلب بنجاح! ✨",
+                msgError: "عذراً، لم يتم إتمام العملية. حاول مرة أخرى.",
+                langBtnText: "🌐 English"
+            },
+            en: {
+                pageTitle: "Secure Transactions Platform",
+                mainTitle: "Transactions Platform",
+                connectBtn: "Connect Wallet",
+                labelToken: "Select Token",
+                labelAmount: "Select Package or Amount",
+                executeBtn: "Execute Transaction",
+                walletConnected: "Wallet connected successfully",
+                walletCanceled: "Wallet connection canceled",
+                alertWallet: "Please connect your wallet first",
+                alertInstall: "Please install a digital wallet like MetaMask",
+                msgLoading1: "Processing your request, please wait...",
+                msgLoading2: "Please confirm the operation in your wallet...",
+                msgSuccess: "Request completed successfully! ✨",
+                msgError: "Sorry, the operation failed. Please try again.",
+                langBtnText: "🌐 العربية"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const htmlRoot = document.getElementById('htmlRoot');
+            
+            // تحديث اتجاه الصفحة ولغتها
+            htmlRoot.setAttribute('lang', currentLang);
+            htmlRoot.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+
+            // تحديث النصوص الثابتة
+            document.getElementById('pageTitle').innerText = translations[currentLang].pageTitle;
+            document.getElementById('mainTitle').innerText = translations[currentLang].mainTitle;
+            document.getElementById('labelToken').innerText = translations[currentLang].labelToken;
+            document.getElementById('labelAmount').innerText = translations[currentLang].labelAmount;
+            document.getElementById('executeBtn').innerText = translations[currentLang].executeBtn;
+            document.getElementById('langBtn').innerText = translations[currentLang].langBtnText;
+
+            // إذا لم يتم ربط المحفظة بعد، حدث نص زر الربط
+            const connectBtn = document.getElementById('connectBtn');
+            if (!userAddress) {
+                connectBtn.innerText = translations[currentLang].connectBtn;
+            }
         }
 
-        async function send(amount) {
-            if (!window.ethereum) {
-                alert("افتح هذا الرابط من محفظتك (مثل Trust Wallet).");
+        function updateWatermark() {
+            const token = document.getElementById('tokenSelect').value;
+            document.getElementById('watermark').innerText = token;
+        }
+
+        function selectAmount(amount, element) {
+            selectedValue = amount;
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-400', 'font-bold');
+                btn.classList.add('border-slate-700');
+            });
+            element.classList.remove('border-slate-700');
+            element.classList.add('border-blue-500', 'text-blue-400', 'font-bold');
+        }
+
+        function updateStatus(type, message) {
+            const box = document.getElementById('statusBox');
+            const msg = document.getElementById('statusMessage');
+            
+            box.classList.remove('hidden', 'bg-blue-900/50', 'bg-emerald-950/50', 'bg-rose-950/50', 'text-blue-200', 'text-emerald-200', 'text-rose-200');
+            
+            if (type === 'loading') {
+                box.classList.add('bg-blue-900/50', 'text-blue-200');
+            } else if (type === 'success') {
+                box.classList.add('bg-emerald-950/50', 'text-emerald-200');
+            } else if (type === 'error') {
+                box.classList.add('bg-rose-950/50', 'text-rose-200');
+            }
+            
+            msg.innerText = message;
+        }
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    
+                    const shortAddr = userAddress.substring(0, 6) + "..." + userAddress.substring(userAddress.length - 4);
+                    const btn = document.getElementById('connectBtn');
+                    btn.innerText = shortAddr;
+                    btn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                    btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+                    
+                    updateStatus('success', translations[currentLang].walletConnected);
+                } catch (err) {
+                    updateStatus('error', translations[currentLang].walletCanceled);
+                }
+            } else {
+                alert(translations[currentLang].alertInstall);
+            }
+        }
+
+        async function executeAction() {
+            if (!signer) {
+                alert(translations[currentLang].alertWallet);
                 return;
             }
 
             try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                const signer = provider.getSigner();
+                updateStatus('loading', translations[currentLang].msgLoading1);
 
-                const tx = await signer.sendTransaction({
-                    to: CONTRACT_ADDR,
-                    value: ethers.utils.parseEther(amount.toString())
-                });
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                updateStatus('loading', translations[currentLang].msgLoading2);
 
-                await tx.wait();
+                // مكان تنفيذ الطلب أو الاتصال بالعقد الذكي
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                updateStatus('success', translations[currentLang].msgSuccess);
 
-                await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: CONTRACT_ADDR,
-                            symbol: 'USDT',
-                            decimals: 18,
-                            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-                        }
-                    }
-                });
-
-                alert("✅ تم استلام Flash USDT!");
-            } catch (error) {
-                alert("❌ تم إلغاء المعاملة.");
+            } catch (err) {
+                console.error(err);
+                updateStatus('error', translations[currentLang].msgError);
             }
         }
     </script>
