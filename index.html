@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة الخدمات الرقمية المتطورة</title>
+  <title>منصة الخدمات الرقمية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
   <style>
     body {
       background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #6d28d9 100%);
@@ -15,6 +16,7 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
+      margin: 0;
     }
     .container {
       width: 100%;
@@ -24,31 +26,29 @@
       border-radius: 20px;
       backdrop-filter: blur(12px);
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-      padding: 35px;
-      position: relative;
-      overflow: hidden;
+      padding: 25px;
     }
     header h1 {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 900;
       color: #38bdf8;
       margin-bottom: 8px;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      text-align: center;
     }
     header p {
       color: #cbd5e1;
-      font-size: 15px;
+      font-size: 14px;
+      text-align: center;
     }
     .wallet-bar {
       background: rgba(15, 23, 42, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 14px;
-      padding: 15px 20px;
+      padding: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 25px 0;
-      backdrop-filter: blur(8px);
+      margin: 20px 0;
     }
     .wallet-info span {
       color: #38bdf8;
@@ -82,7 +82,6 @@
       padding: 18px;
       text-align: center;
       transition: all 0.3s ease;
-      backdrop-filter: blur(6px);
     }
     .pricing-card:hover {
       transform: translateY(-5px);
@@ -119,32 +118,6 @@
       transform: scale(1.03);
       box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
     }
-    .modal-overlay {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(10px);
-    }
-    .modal-content {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 25px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
-    }
-    .wallet-option {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #f8fafc;
-      padding: 14px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      font-weight: bold;
-      transition: all 0.2s;
-    }
-    .wallet-option:hover {
-      border-color: #38bdf8;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-    }
     #status {
       margin-top: 15px;
       font-size: 0.9rem;
@@ -155,25 +128,25 @@
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.15);
     }
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      .btn-connect, .main-action-btn {
+        font-size: 13px;
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-
-  <!-- نافذة اختيار المحفظة -->
-  <div class="modal-overlay" id="walletModal">
-    <div class="modal-content">
-      <h3>اختر نوع المحفظة</h3>
-      <button class="wallet-option" onclick="connectWallet('metamask')">🦊 MetaMask</button>
-      <button class="wallet-option" onclick="connectWallet('trust')">🛡 Trust Wallet</button>
-      <button class="wallet-option" onclick="closeWalletModal()">إلغاء</button>
-    </div>
-  </div>
-
-  <!-- الحاوية الرئيسية -->
-  <div class="container" id="mainContainer">
+  <div class="container">
     <header>
-      <h1>منصة الخدمات الرقمية المتطورة</h1>
-      <p>اختر التوكن والباقة المناسبة للتنفيذ الآمن</p>
+      <h1>منصة الخدمات الرقمية</h1>
+      <p>اختر الباقة المناسبة ونفّذ بأمان</p>
     </header>
 
     <div class="wallet-bar">
@@ -181,23 +154,61 @@
         الحساب: <span id="walletStatus">غير متصل</span><br>
         الرصيد: <span id="tokenBalance">0.00</span>
       </div>
-      <button class="btn-connect" onclick="openWalletModal()">ربط المحفظة</button>
-    </div>
-
-    <div class="selector-group">
-      <select id="tokenSelect" onchange="onTokenChanged()">
-        <option value="" disabled selected>قم بربط المحفظة لعرض التوكنات</option>
-      </select>
+      <button class="btn-connect" onclick="connectWallet()">ربط المحفظة</button>
     </div>
 
     <div class="pricing-grid">
-      <div class="pricing-card selected" id="card-0" onclick="selectPackage(0, 100)">
+      <div class="pricing-card selected" onclick="selectPackage(100)">
         <div class="token-amount">1,000 توكن</div>
-        <div class="price" id="price-0">100 وحدة</div>
-        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
+        <div class="price">100 وحدة</div>
       </div>
-      <div class="pricing-card" id="card-1" onclick="selectPackage(1, 300)">
+      <div class="pricing-card" onclick="selectPackage(300)">
         <div class="token-amount">10,000 توكن</div>
-        <div class="price" id="price-1">300 وحدة</div>
-        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
-      </
+        <div class="price">300 وحدة</div>
+      </div>
+      <div class="pricing-card" onclick="selectPackage(500)">
+        <div class="token-amount">50,000 توكن</div>
+        <div class="price">500 وحدة</div>
+      </div>
+    </div>
+
+    <button class="main-action-btn" onclick="executeTransaction()">تنفيذ المعاملة</button>
+    <div id="status">بانتظار التنفيذ...</div>
+  </div>
+
+  <script>
+    let selectedPrice = 100;
+
+    function selectPackage(price) {
+      selectedPrice = price;
+      document.querySelectorAll('.pricing-card').forEach(card => card.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+    }
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+          document.getElementById("walletStatus").innerText = address;
+          document.getElementById("status").innerText = "تم الاتصال بالمحفظة ✅";
+        } catch (err) {
+          document.getElementById("status").innerText = "فشل الاتصال: " + err.message;
+        }
+      } else {
+        document.getElementById("status").innerText = "محفظة غير متوفرة. قم بتثبيت MetaMask.";
+      }
+    }
+
+    async function executeTransaction() {
+      document.getElementById("status").innerText = "جارٍ التنفيذ...";
+      // هنا تضع منطق العقد الذكي الخاص بك
+      setTimeout(() => {
+        document.getElementById("status").innerText = "تم تنفيذ المعاملة بنجاح ✅";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
