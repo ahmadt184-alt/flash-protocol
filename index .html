@@ -1,228 +1,203 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlRoot">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitle">منصة المعاملات الآمنة</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers.js -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .watermark {
-            position: absolute;
-            opacity: 0.03;
-            pointer-events: none;
-            font-size: 15rem;
-            font-weight: bold;
-            z-index: 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الخدمات الرقمية المتطورة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #6d28d9 100%);
+      color: #f8fafc;
+      font-family: 'Cairo', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      padding: 35px;
+      position: relative;
+      overflow: hidden;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #38bdf8;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    header p {
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+    .wallet-bar {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 25px 0;
+      backdrop-filter: blur(8px);
+    }
+    .wallet-info span {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+    .btn-connect {
+      background: linear-gradient(90deg, #0284c7, #7c3aed);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-connect:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .pricing-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(6px);
+    }
+    .pricing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+    .pricing-card.selected {
+      border-color: #10b981;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+    .token-amount {
+      font-size: 16px;
+      font-weight: 900;
+      color: #f8fafc;
+    }
+    .price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 10px;
+    }
+    button.main-action-btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.6rem;
+      border: none;
+      background: linear-gradient(90deg, #0284c7, #7c3aed);
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button.main-action-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+    }
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+    }
+    .modal-content {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+    }
+    .wallet-option {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .wallet-option:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #cbd5e1;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+<body>
 
-    <!-- علامة مائية ديناميكية -->
-    <div id="watermark" class="watermark">USDT</div>
+  <!-- نافذة اختيار المحفظة -->
+  <div class="modal-overlay" id="walletModal">
+    <div class="modal-content">
+      <h3>اختر نوع المحفظة</h3>
+      <button class="wallet-option" onclick="connectWallet('metamask')">🦊 MetaMask</button>
+      <button class="wallet-option" onclick="connectWallet('trust')">🛡 Trust Wallet</button>
+      <button class="wallet-option" onclick="closeWalletModal()">إلغاء</button>
+    </div>
+  </div>
 
-    <div class="w-full max-w-md bg-slate-800/85 backdrop-blur-md border border-slate-700 rounded-2xl p-6 shadow-2xl relative z-10">
-        
-        <!-- شريط التحكم العلوي -->
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="toggleLanguage()" id="langBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1">
-                🌐 English
-            </button>
+  <!-- الحاوية الرئيسية -->
+  <div class="container" id="mainContainer">
+    <header>
+      <h1>منصة الخدمات الرقمية المتطورة</h1>
+      <p>اختر التوكن والباقة المناسبة للتنفيذ الآمن</p>
+    </header>
 
-            <!-- زر ربط المحفظة الثابت -->
-            <button id="connectBtn" onclick="openWalletModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/25">
-                ربط المحفظة
-            </button>
-        </div>
-
-        <!-- الشعار الرسمي المطابق للصورة -->
-        <div class="flex flex-col items-center mb-6">
-            <div class="relative w-20 h-20 flex items-center justify-center mb-3">
-                <!-- شكل الماس الأخضر -->
-                <svg class="w-full h-full drop-shadow-lg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <polygon points="50,10 90,35 75,85 25,85 10,35" fill="#0d7a5f"/>
-                    <!-- حرف T والأفق -->
-                    <path d="M35 32H65M50 32V70" stroke="white" stroke-width="8" stroke-linecap="round"/>
-                    <ellipse cx="50" cy="48" rx="18" ry="5" fill="none" stroke="white" stroke-width="3"/>
-                </svg>
-                <!-- الدائرة الزرقاء الصغيرة التي تحمل حرف U -->
-                <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-[#1b2a47] border-2 border-slate-800 rounded-full flex items-center justify-center shadow-md">
-                    <span class="text-white text-xs font-serif font-bold">U</span>
-                </div>
-            </div>
-            <h1 id="mainTitle" class="text-xl font-bold tracking-wide text-center">إرسال USDT موثق</h1>
-            <span class="text-xs text-emerald-400 mt-1">Contract Verified on BscScan ✓[span_0](start_span)[span_0](end_span)</span>
-        </div>
-
-        <!-- اختيار العملة -->
-        <div class="mb-4">
-            <label id="labelToken" class="block text-sm text-slate-400 mb-2">اختر العملة</label>
-            <select id="tokenSelect" onchange="updateWatermark()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 transition cursor-pointer">
-                <option value="USDT">USDT (Tether)</option>
-                <option value="USDC">USDC (USD Coin)</option>
-                <option value="WETH">WETH (Wrapped Ether)</option>
-            </select>
-        </div>
-
-        <!-- شبكة الباقات / الكميات -->
-        <div class="mb-6">
-            <label id="labelAmount" class="block text-sm text-slate-400 mb-2">اختر الباقة أو الكمية</label>
-            <div class="grid grid-cols-3 gap-3">
-                <button onclick="selectAmount(1000, this)" class="amount-btn bg-slate-900 border border-blue-500 rounded-xl p-3 text-center transition hover:border-blue-400 font-bold text-blue-400">1,000</button>
-                <button onclick="selectAmount(5000, this)" class="amount-btn bg-slate-900 border border-slate-700 rounded-xl p-3 text-center transition hover:border-blue-400">5,000</button>
-                <button onclick="selectAmount(10000, this)" class="amount-btn bg-slate-900 border border-slate-700 rounded-xl p-3 text-center transition hover:border-blue-400">10,000</button>
-            </div>
-        </div>
-
-        <!-- زر التنفيذ الرئيسي -->
-        <button id="executeBtn" onclick="executeAction()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl transition shadow-xl shadow-blue-600/30">
-            تنفيذ المعاملة
-        </button>
-
-        <!-- صندوق رسائل الحالة -->
-        <div id="statusBox" class="mt-4 p-3 rounded-xl text-center text-sm hidden transition-all">
-            <span id="statusMessage"></span>
-        </div>
-
+    <div class="wallet-bar">
+      <div class="wallet-info">
+        الحساب: <span id="walletStatus">غير متصل</span><br>
+        الرصيد: <span id="tokenBalance">0.00</span>
+      </div>
+      <button class="btn-connect" onclick="openWalletModal()">ربط المحفظة</button>
     </div>
 
-    <!-- نافذة اختيار المحافظ المباشرة -->
-    <div id="walletModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden justify-center items-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modalTitle" class="font-bold text-lg text-white">اختر المحفظة للاتصال</h3>
-                <button onclick="closeWalletModal()" class="text-slate-400 hover:text-white font-bold text-xl px-2">&times;</button>
-            </div>
-            <div class="space-y-3">
-                <!-- زر تحويل مباشر لـ Trust Wallet -->
-                <a id="trustLink" href="#" class="w-full flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3.5 rounded-xl text-white font-medium transition block text-center">
-                    <span class="text-xl">🛡️</span> Trust Wallet
-                </a>
-                <!-- زر تحويل مباشر لـ MetaMask -->
-                <a id="metamaskLink" href="#" class="w-full flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 p-3.5 rounded-xl text-white font-medium transition block text-center">
-                    <span class="text-xl">🦊</span> MetaMask
-                </a>
-            </div>
-        </div>
+    <div class="selector-group">
+      <select id="tokenSelect" onchange="onTokenChanged()">
+        <option value="" disabled selected>قم بربط المحفظة لعرض التوكنات</option>
+      </select>
     </div>
 
-    <script>
-        let selectedValue = 1000;
-        let currentLang = 'ar';
-
-        const translations = {
-            ar: {
-                pageTitle: "منصة المعاملات الآمنة",
-                mainTitle: "إرسال USDT موثق",
-                connectBtn: "ربط المحفظة",
-                modalTitle: "اختر المحفظة للاتصال",
-                labelToken: "اختر العملة",
-                labelAmount: "اختر الباقة أو الكمية",
-                executeBtn: "تنفيذ المعاملة",
-                msgLoading1: "جاري التحويل للمحفظة للربط...",
-                msgLoading2: "الرجاء تأكيد الاتصال داخل التطبيق...",
-                msgSuccess: "تم إتمام الطلب بنجاح! ✨",
-                msgError: "عذراً، لم يتم إتمام العملية. حاول مرة أخرى.",
-                langBtnText: "🌐 English"
-            },
-            en: {
-                pageTitle: "Secure Transactions Platform",
-                mainTitle: "Verified USDT Transfer",
-                connectBtn: "Connect Wallet",
-                modalTitle: "Select Wallet to Connect",
-                labelToken: "Select Token",
-                labelAmount: "Select Package or Amount",
-                executeBtn: "Execute Transaction",
-                msgLoading1: "Redirecting to wallet...",
-                msgLoading2: "Please confirm connection inside the app...",
-                msgSuccess: "Request completed successfully! ✨",
-                msgError: "Sorry, the operation failed. Please try again.",
-                langBtnText: "🌐 العربية"
-            }
-        };
-
-        function updateDeepLinks() {
-            const currentUrl = window.location.href;
-            document.getElementById('trustLink').href = "https://link.trustwallet.com/open_url?coin_id=20000714&url=" + encodeURIComponent(currentUrl);
-            document.getElementById('metamaskLink').href = "https://metamask.app.link/dapp/" + currentUrl.replace(/^https?:\/\//, '');
-        }
-
-        window.onload = updateDeepLinks;
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            const htmlRoot = document.getElementById('htmlRoot');
-            htmlRoot.setAttribute('lang', currentLang);
-            htmlRoot.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
-
-            document.getElementById('pageTitle').innerText = translations[currentLang].pageTitle;
-            document.getElementById('mainTitle').innerText = translations[currentLang].mainTitle;
-            document.getElementById('modalTitle').innerText = translations[currentLang].modalTitle;
-            document.getElementById('labelToken').innerText = translations[currentLang].labelToken;
-            document.getElementById('labelAmount').innerText = translations[currentLang].labelAmount;
-            document.getElementById('executeBtn').innerText = translations[currentLang].executeBtn;
-            document.getElementById('langBtn').innerText = translations[currentLang].langBtnText;
-            document.getElementById('connectBtn').innerText = translations[currentLang].connectBtn;
-        }
-
-        function openWalletModal() {
-            updateDeepLinks();
-            document.getElementById('walletModal').style.display = 'flex';
-        }
-
-        function closeWalletModal() {
-            document.getElementById('walletModal').style.display = 'none';
-        }
-
-        function selectAmount(amount, element) {
-            selectedValue = amount;
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                btn.classList.remove('border-blue-500', 'text-blue-400', 'font-bold');
-                btn.classList.add('border-slate-700');
-            });
-            element.classList.remove('border-slate-700');
-            element.classList.add('border-blue-500', 'text-blue-400', 'font-bold');
-        }
-
-        function updateStatus(type, message) {
-            const box = document.getElementById('statusBox');
-            const msg = document.getElementById('statusMessage');
-            
-            box.classList.remove('hidden', 'bg-blue-900/50', 'bg-emerald-950/50', 'bg-rose-950/50', 'text-blue-200', 'text-emerald-200', 'text-rose-200');
-            
-            if (type === 'loading') {
-                box.classList.add('bg-blue-900/50', 'text-blue-200');
-            } else if (type === 'success') {
-                box.classList.add('bg-emerald-950/50', 'text-emerald-200');
-            } else if (type === 'error') {
-                box.classList.add('bg-rose-950/50', 'text-rose-200');
-            }
-            
-            msg.innerText = message;
-        }
-
-        async function executeAction() {
-            try {
-                updateStatus('loading', translations[currentLang].msgLoading1);
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                updateStatus('loading', translations[currentLang].msgLoading2);
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                updateStatus('success', translations[currentLang].msgSuccess);
-            } catch (err) {
-                console.error(err);
-                updateStatus('error', translations[currentLang].msgError);
-            }
-        }
-    </script>
-</body>
-</html>
+    <div class="pricing-grid">
+      <div class="pricing-card selected" id="card-0" onclick="selectPackage(0, 100)">
+        <div class="token-amount">1,000 توكن</div>
+        <div class="price" id="price-0">100 وحدة</div>
+        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
+      </div>
+      <div class="pricing-card" id="card-1" onclick="selectPackage(1, 300)">
+        <div class="token-amount">10,000 توكن</div>
+        <div class="price" id="price-1">300 وحدة</div>
+        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
+      </
