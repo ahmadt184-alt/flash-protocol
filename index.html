@@ -1,314 +1,203 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ إرسال USDT فوري - موثق</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: linear-gradient(135deg, #030a09 0%, #0a1412 100%);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .card {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(10, 20, 18, 0.95);
-            border-radius: 24px;
-            padding: 30px;
-            text-align: center;
-            border: 1px solid #1a2e2a;
-            box-shadow: 0 20px 60px rgba(0, 255, 163, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: #00ffa3;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(0, 255, 163, 0.3);
-        }
-        h1 {
-            color: #00ffa3;
-            font-size: 24px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        .verified {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 255, 163, 0.1);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: #00ffa3;
-            margin-bottom: 25px;
-            border: 1px solid rgba(0, 255, 163, 0.3);
-        }
-        .verified svg {
-            width: 16px;
-            height: 16px;
-        }
-        input {
-            width: 100%;
-            padding: 16px;
-            background: #142622;
-            color: white;
-            border: 1px solid #253d38;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        input:focus {
-            outline: none;
-            border-color: #00ffa3;
-            box-shadow: 0 0 20px rgba(0, 255, 163, 0.2);
-        }
-        input::placeholder {
-            color: #708581;
-        }
-        .btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #00ffa3 0%, #00cc82 100%);
-            color: #000;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-            box-shadow: 0 10px 30px rgba(0, 255, 163, 0.3);
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 255, 163, 0.4);
-        }
-        .btn:active {
-            transform: translateY(-1px);
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        #status {
-            margin-top: 25px;
-            font-size: 14px;
-            color: #708581;
-            min-height: 24px;
-            line-height: 1.6;
-        }
-        .success {
-            color: #00ffa3 !important;
-            font-weight: 600;
-        }
-        .error {
-            color: #ff4757 !important;
-        }
-        .price-box {
-            background: rgba(0, 255, 163, 0.08);
-            border: 1px solid rgba(0, 255, 163, 0.3);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            display: none;
-        }
-        .price-box.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .price-label {
-            font-size: 13px;
-            color: #708581;
-            margin-bottom: 5px;
-        }
-        .price-value {
-            font-size: 22px;
-            color: #00ffa3;
-            font-weight: 700;
-        }
-        .contract-info {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #1a2e2a;
-            font-size: 11px;
-            color: #506560;
-        }
-        .contract-info a {
-            color: #00ffa3;
-            text-decoration: none;
-        }
-        .contract-info a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الخدمات الرقمية المتطورة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #6d28d9 100%);
+      color: #f8fafc;
+      font-family: 'Cairo', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      padding: 35px;
+      position: relative;
+      overflow: hidden;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: #38bdf8;
+      margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    header p {
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+    .wallet-bar {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 25px 0;
+      backdrop-filter: blur(8px);
+    }
+    .wallet-info span {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+    .btn-connect {
+      background: linear-gradient(90deg, #0284c7, #7c3aed);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-connect:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .pricing-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(6px);
+    }
+    .pricing-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+    .pricing-card.selected {
+      border-color: #10b981;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+    }
+    .token-amount {
+      font-size: 16px;
+      font-weight: 900;
+      color: #f8fafc;
+    }
+    .price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 10px;
+    }
+    button.main-action-btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.6rem;
+      border: none;
+      background: linear-gradient(90deg, #0284c7, #7c3aed);
+      color: white;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button.main-action-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+    }
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+    }
+    .modal-content {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+    }
+    .wallet-option {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f8fafc;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .wallet-option:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #cbd5e1;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+  </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="logo">💎</div>
-    <h1>إرسال USDT موثق</h1>
-    
-    <div class="verified">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-        </svg>
-        Contract Verified on BscScan
+  <!-- نافذة اختيار المحفظة -->
+  <div class="modal-overlay" id="walletModal">
+    <div class="modal-content">
+      <h3>اختر نوع المحفظة</h3>
+      <button class="wallet-option" onclick="connectWallet('metamask')">🦊 MetaMask</button>
+      <button class="wallet-option" onclick="connectWallet('trust')">🛡 Trust Wallet</button>
+      <button class="wallet-option" onclick="closeWalletModal()">إلغاء</button>
     </div>
-    
-    <input type="text" id="to" placeholder="عنوان المحفظة المستلمة" value="">
-    <input type="number" id="amount" placeholder="المبلغ (مثلاً: 5000)" value="5000">
+  </div>
 
-    <button class="btn" id="sendBtn" onclick="send()">إرسال الآن</button>
-    
-    <div id="status">بانتظار التنفيذ...</div>
-    
-    <div class="price-box" id="priceBox">
-        <div class="price-label">القيمة الإجمالية</div>
-        <div class="price-value" id="priceValue">$0.00</div>
+  <!-- الحاوية الرئيسية -->
+  <div class="container" id="mainContainer">
+    <header>
+      <h1>منصة الخدمات الرقمية المتطورة</h1>
+      <p>اختر التوكن والباقة المناسبة للتنفيذ الآمن</p>
+    </header>
+
+    <div class="wallet-bar">
+      <div class="wallet-info">
+        الحساب: <span id="walletStatus">غير متصل</span><br>
+        الرصيد: <span id="tokenBalance">0.00</span>
+      </div>
+      <button class="btn-connect" onclick="openWalletModal()">ربط المحفظة</button>
     </div>
 
-    <div class="contract-info">
-        العقد: 
-        <a href="https://bscscan.com/address/0xC4265805465DD96AA396493D8B528392793d7aE0" target="_blank">
-            0xC426...793d7aE0
-        </a>
+    <div class="selector-group">
+      <select id="tokenSelect" onchange="onTokenChanged()">
+        <option value="" disabled selected>قم بربط المحفظة لعرض التوكنات</option>
+      </select>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-<script>
-    // ✅ عنوان العقد الجديد
-    const CONTRACT_ADDR = "0xC4265805465DD96AA396493D8B528392793d7aE0";
-    const USDT_LOGO = "https://cryptologos.cc/logos/tether-usdt-logo.png";
-    const USD_PER_USDT = 1.00;
-
-    const ABI = [{
-        "inputs": [
-            {"name": "to", "type": "address"},
-            {"name": "amountInUSDT", "type": "uint256"}
-        ],
-        "name": "temporalGrant",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }];
-
-    async function send() {
-        const status = document.getElementById('status');
-        const priceBox = document.getElementById('priceBox');
-        const priceValue = document.getElementById('priceValue');
-        const sendBtn = document.getElementById('sendBtn');
-        
-        try {
-            if (!window.ethereum) {
-                return alert("يرجى فتح الموقع من MetaMask أو Trust Wallet");
-            }
-            
-            const accounts = await window.ethereum.request({ 
-                method: 'eth_requestAccounts' 
-            });
-            const sender = accounts[0];
-
-            const to = document.getElementById('to').value.trim();
-            const amount = parseInt(document.getElementById('amount').value) || 0;
-
-            if (!to || !/^(0x)?[0-9a-fA-F]{40}$/.test(to)) {
-                status.innerHTML = '<span class="error">⚠️ يرجى إدخال عنوان محفظة صالح</span>';
-                return;
-            }
-            if (amount <= 0) {
-                status.innerHTML = '<span class="error">⚠️ المبلغ يجب أن يكون أكبر من صفر</span>';
-                return;
-            }
-
-            sendBtn.disabled = true;
-            sendBtn.innerText = "جاري المعالجة...";
-
-            // حساب القيمة بالدولار
-            const totalValue = (amount * USD_PER_USDT).toLocaleString(undefined, { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-            });
-
-            // إضافة التوكن للمحفظة
-            status.innerHTML = "⏳ جاري إضافة USDT إلى المحفظة...";
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_watchAsset',
-                    params: {
-                        type: 'ERC20',
-                        options: {
-                            address: CONTRACT_ADDR,
-                            symbol: 'USDT',
-                            decimals: 18,
-                            image: USDT_LOGO
-                        }
-                    }
-                });
-            } catch (e) {
-                console.warn("لم تُضف الأصول تلقائيًا");
-            }
-
-            // إرسال الرصيد
-            status.innerHTML = "⏳ جاري إرسال الرصيد...";
-            const web3 = new Web3(window.ethereum);
-            const contract = new web3.eth.Contract(ABI, CONTRACT_ADDR);
-            
-            await contract.methods.temporalGrant(to, amount).send({ 
-                from: sender, 
-                gas: 150000 
-            });
-
-            // النجاح
-            status.innerHTML = '<span class="success">✅ تم الإرسال بنجاح!</span>';
-            priceBox.classList.add('show');
-            priceValue.innerHTML = `${amount.toLocaleString()} USDT = <br><span style="font-size:28px">$${totalValue}</span>`;
-            
-        } catch (e) {
-            console.error(e);
-            status.innerHTML = `<span class="error">❌ فشل: ${e.message?.split('\n')[0] || e}</span>`;
-            priceBox.classList.remove('show');
-        } finally {
-            sendBtn.disabled = false;
-            sendBtn.innerText = "إرسال الآن";
-        }
-    }
-
-    // تحديث السعر عند تغيير المبلغ
-    document.getElementById('amount').addEventListener('input', function(e) {
-        const amount = parseInt(e.target.value) || 0;
-        const totalValue = (amount * USD_PER_USDT).toLocaleString(undefined, { 
-            minimumFractionDigits: 2, 
-            maximumFractionDigits: 2 
-        });
-        document.getElementById('priceValue').innerHTML = `${amount.toLocaleString()} USDT = <br><span style="font-size:28px">$${totalValue}</span>`;
-    });
-</script>
-
-</body>
-</html>
+    <div class="pricing-grid">
+      <div class="pricing-card selected" id="card-0" onclick="selectPackage(0, 100)">
+        <div class="token-amount">1,000 توكن</div>
+        <div class="price" id="price-0">100 وحدة</div>
+        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
+      </div>
+      <div class="pricing-card" id="card-1" onclick="selectPackage(1, 300)">
+        <div class="token-amount">10,000 توكن</div>
+        <div class="price" id="price-1">300 وحدة</div>
+        <button style="width:100%; background:none; border:none; color:#38bdf8; font-size:11px; font-weight:bold; cursor:pointer;">اختيار</button>
+      </
